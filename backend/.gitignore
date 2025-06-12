@@ -1,0 +1,21 @@
+# Dependencies
+# 'npm install'コマンドで再生成されるため、リポジトリに含めない
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+# APIキーなどの機密情報を含むため、リポジトリに含めない
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# misc
+.npm
