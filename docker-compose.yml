@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  # バックエンドサービス
+  backend:
+    build: ./backend
+    # コンテナ名を指定
+    container_name: sample-backend
+
+  # フロントエンドサービス
+  frontend:
+    build: ./frontend
+    container_name: sample-frontend
+    ports:
+      # ホストPCの8080ポートをコンテナの80ポートにマッピング
+      - "8080:80"
+    # backendサービスが起動してからfrontendを起動する
+    depends_on:
+      - backend
