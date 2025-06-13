@@ -7,5 +7,5 @@ docker-compose up --build
 
 //以下にアクセス
 
-http://localhost:8080
+http://localhost:3000
 
