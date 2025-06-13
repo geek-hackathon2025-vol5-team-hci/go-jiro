@@ -18,7 +18,9 @@ export default function Home() {
   // ページが読み込まれた時に一度だけ実行される処理
   useEffect(() => {
     // ログイン状態を確認するAPIを叩く
-    fetch('/api/profile')
+    fetch('/api/auth/profile', {
+            credentials: 'include'
+        })
       .then(response => {
         if (!response.ok) {
           // 401 Unauthorizedなどの場合は未ログインと判断
@@ -44,7 +46,7 @@ export default function Home() {
   // 公開メッセージを取得するボタンの処理
   const handleFetchMessage = () => {
     setMessage('取得中...');
-    fetch('/api/message')
+    fetch('/api/messages')
       .then(response => response.json())
       .then(data => {
         setMessage(data.message);
@@ -69,7 +71,7 @@ export default function Home() {
           <p>Email: {user.emails[0].value}</p>
           <img src={user.photos[0].value} alt="プロフィール画像" width="50" />
           <br />
-          <a href="/api/logout"><button>ログアウト</button></a>
+          <a href="/api/auth/logout"><button>ログアウト</button></a>
         </div>
       );
     } else {
