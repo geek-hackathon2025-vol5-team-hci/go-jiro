@@ -1,7 +1,8 @@
 # 1. 依存関係のインストールステージ
 FROM node:18-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json ./
+COPY package-lock.json* ./
 RUN npm install
 
 # 2. ビルドステージ

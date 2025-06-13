@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
@@ -20,7 +23,7 @@ app.use(passport.session());
 
 // CORS(クロスオリジンリクエスト)を許可
 app.use(cors({
-  origin: 'http://localhost:8080', // フロントエンドのオリジンを許可
+  origin: 'http://localhost:3000', // フロントエンドのオリジンを許可
   credentials: true
 }));
 
@@ -28,7 +31,7 @@ app.use(cors({
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/api/auth/google/callback", // Nginx経由のパス
+    callbackURL: "http://localhost:3000/api/auth/google/callback", 
     scope: ['profile', 'email']
   },
   (accessToken, refreshToken, profile, done) => {
@@ -88,7 +91,7 @@ app.get('/api/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     // 認証成功後、フロントエンドのホームページにリダイレクト
-    res.redirect('http://localhost:8080');
+    res.redirect('http://localhost:3000');
   }
 );
 
@@ -96,7 +99,7 @@ app.get('/api/auth/google/callback',
 app.get('/api/logout', (req, res, next) => {
     req.logout(err => {
         if (err) { return next(err); }
-        res.redirect('http://localhost:8080');
+        res.redirect('http://localhost:3000');
     });
 });
 
