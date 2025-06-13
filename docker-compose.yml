@@ -23,7 +23,7 @@ services:
     build: ./frontend
     container_name: sample-nextjs-frontend
     ports:
-      - "3000:3000" # Next.jsは3000番ポートで動作
+      - "3001:3000" # Next.jsは3000番ポートで動作
     depends_on:
       - backend
     restart: unless-stopped
