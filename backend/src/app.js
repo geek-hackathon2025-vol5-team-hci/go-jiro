@@ -27,7 +27,9 @@ app.use(cors({
   credentials: true // 
 }));
 
-// APIルーターを適用
+app.use(express.json()); // POSTリクエストのbodyをパースするために追加
+
+// APIルーティングを適用
 app.use('/api', apiRouter);
 
 module.exports = app;
