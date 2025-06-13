@@ -1,3 +1,5 @@
+# version: '3.8'
+
 services:
   # バックエンドサービス
   backend:
@@ -6,13 +8,44 @@ services:
     container_name: sample-backend
     env_file:
       - ./backend/.env
+    ports:
+      - "3000:3000"
+    environment:
+      # データベース接続URLを環境変数として設定
+      DATABASE_URL: "postgresql://user:password@db:5432/mydatabase"
+    # dbサービスが起動してからbackendを起動する
+    depends_on:
+      db:
+        condition: service_healthy
 
   # フロントエンドサービス
   frontend:
     build: ./frontend
     container_name: sample-nextjs-frontend
     ports:
-      - "3000:3000" # Next.jsは3000番ポートで動作
+      - "3001:3000" # Next.jsは3000番ポートで動作
     depends_on:
       - backend
     restart: unless-stopped
+
+  # PostgreSQLサービス
+  db:
+    image: postgres:14
+    container_name: sample-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      # デバッグ用にホストPCの5432ポートをコンテナの5432ポートにマッピング
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d mydatabase" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

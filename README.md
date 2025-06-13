@@ -9,3 +9,7 @@ docker-compose up --build
 
 http://localhost:3000
 
+//データベース初期化？
+
+docker-compose exec backend npm run prisma:migrate
+

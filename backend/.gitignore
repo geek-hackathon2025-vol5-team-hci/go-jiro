@@ -19,3 +19,14 @@ yarn-error.log*
 
 # misc
 .npm
+
+# Prisma
+# prisma migrate dev が作成するローカルの開発用データベース
+prisma/dev.db
+prisma/*.db
+prisma/*.db-journal
+
+# Build output
+# TypeScript等を使用した場合のビルド成果物
+dist/
+build/
