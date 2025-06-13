@@ -1,7 +1,9 @@
+const accessLogService = require('../services/accessLogService')
+
 exports.getNewMessage = async (req, res) => {
   try {
-    // const newLog = await accessLogService.createLog('アクセスがありました。');
-    const newLog = { id: 999 }; // 仮のIDを返す
+    const newLog = await accessLogService.createLog('アクセスがありました。');
+    //const newLog = { id: 999 }; // 仮のIDを返す
 
     const message = `こんにちは！Backendからのメッセージです 👋 あなたは${newLog.id}番目の訪問者です。`;
 
