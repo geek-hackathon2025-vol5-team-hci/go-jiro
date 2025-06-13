@@ -6,6 +6,8 @@ services:
     build: ./backend
     # コンテナ名を指定
     container_name: sample-backend
+    env_file:
+      - ./backend/.env
 
   # フロントエンドサービス
   frontend:
