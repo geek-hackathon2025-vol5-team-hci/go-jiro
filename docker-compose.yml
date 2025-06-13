@@ -12,10 +12,9 @@ services:
   # フロントエンドサービス
   frontend:
     build: ./frontend
-    container_name: sample-frontend
+    container_name: sample-nextjs-frontend
     ports:
-      # ホストPCの8080ポートをコンテナの80ポートにマッピング
-      - "8080:80"
-    # backendサービスが起動してからfrontendを起動する
+      - "3000:3000" # Next.jsは3000番ポートで動作
     depends_on:
       - backend
+    restart: unless-stopped
