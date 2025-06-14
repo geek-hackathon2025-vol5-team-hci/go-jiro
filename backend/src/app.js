@@ -1,35 +1,35 @@
 // backend/src/app.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const session = require('express-session');
 const apiRouter = require('./api');
-
-// Passportの設定ファイルを読み込みます
-require('./config/passport');
+require('./config/passport'); // Passport 設定
 
 const app = express();
 
-// セッションの設定 (Passportより前に記述)
+// CORSは先に設定し、cookieを有効にする
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+
+// JSON パースミドルウェア
+app.use(express.json());
+
+// セッションの設定（Passportの前）
 app.use(session({
-  secret: process.env.SESSION_SECRET, // 
-  resave: false, // 
-  saveUninitialized: true, // 
+  secret: process.env.SESSION_SECRET || 'fallback-secret',
+  resave: false,
+  saveUninitialized: true // trueだと未認証のユーザーにもセッションが作られる
 }));
 
 // Passportの初期化
-app.use(passport.initialize()); // 
-app.use(passport.session()); // 
+app.use(passport.initialize());
+app.use(passport.session());
 
-// CORS(クロスオリジンリクエスト)を許可
-app.use(cors({
-  origin: 'http://localhost:3001', // 
-  credentials: true // 
-}));
-
-app.use(express.json()); // POSTリクエストのbodyをパースするために追加
-
-// APIルーティングを適用
+// APIルーティングは最後
 app.use('/api', apiRouter);
 
 module.exports = app;
