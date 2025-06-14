@@ -10,6 +10,7 @@ services:
       - ./backend/.env
     ports:
       - "3000:3000"
+      - "5555:5555" # Prisma Studio用のポートを追加
     environment:
       # データベース接続URLを環境変数として設定
       DATABASE_URL: "postgresql://user:password@db:5432/mydatabase"
@@ -17,6 +18,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    stdin_open: true
+    tty: true
 
   # フロントエンドサービス
   frontend:

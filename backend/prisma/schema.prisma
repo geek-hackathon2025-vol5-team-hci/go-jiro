@@ -30,7 +30,10 @@ model Store {
 // ユーザー情報を格納するモデルを追加します
 model User {
   id           Int      @id @default(autoincrement())
-  username     String   @unique // ユーザー名は他の人と重複しないように設定
+  googleId    String   @unique // Googleから提供されるユニークなID
+  email        String   @unique
+  displayName String?
+  username     String?  @unique // ユーザー名は他の人と重複しないように設定
   jiroCount    Int      @default(0) // 二郎を食べた回数。デフォルトは0
   favoriteCall String?  // 好きなコールは任意登録
   age          Int?     // 年齢は任意登録
