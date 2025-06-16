@@ -6,6 +6,7 @@ interface UserProfile {
   displayName: string;
   emails: { value: string }[];
   photos: { value: string }[];
+  isNewUser?: boolean; // 初回ログインフラグ (オプショナル)
 }
 
 export default function Home() {
@@ -21,6 +22,11 @@ export default function Home() {
       .then((data) => {
         if (data.user) {
           setUser(data.user);
+          // isNewUserフラグを受け取ってコンソールに出力
+          if (data.user.isNewUser) {
+            console.log('ようこそ！初回ログインです。');
+          // ここでウェルカムモーダルを表示するなどの処理を実装できます
+          }
         }
       })
       .catch(() => {
