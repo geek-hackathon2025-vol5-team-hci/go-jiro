@@ -26,9 +26,26 @@ model Shop {
   address   String?
   latitude  Float    // 緯度
   longitude Float    // 経度
+  callOrder   String?
+  callRules   CallRule[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  jiro_difficulty Int //次郎難易度
 }
+
+model CallRule {
+  id        Int      @id @default(autoincrement())
+  shopId    Int      // どの店舗のルールかを示すID
+  category  String   // カテゴリ (例: "ヤサイ", "ニンニク")
+  option    String   // 選択肢 (例: "少なめ", "多め（マシ）")
+  callText  String   // 出力されるコール文言 (例: "ヤサイスクナメ")
+  
+  // Shopモデルとのリレーションを定義
+  shop      Shop     @relation(fields: [shopId], references: [id])
+
+  @@unique([shopId, category, option]) // 同じ店の同じルールの重複を防ぐ
+}
+
 
 // ユーザー情報を格納するモデルを追加します
 model User {
