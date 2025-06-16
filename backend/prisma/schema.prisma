@@ -1,0 +1,39 @@
+// Prismaスキーマファイルです。
+// 詳細はドキュメントを参照してください: https://pris.ly/d/prisma-schema
+
+// データベース接続を定義します
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // docker-compose.ymlの環境変数を使用します
+}
+
+// Prisma Clientジェネレーターを定義します
+generator client {
+  provider = "prisma-client-js"
+}
+
+// アプリケーションコードに合わせたAccessLogモデルを定義します
+model AccessLog {
+  id        Int      @id @default(autoincrement())
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// お店の情報を格納するモデル
+model Store {
+  id       Int    @id @default(autoincrement())
+  name     String
+  location String
+  jiro_value   Float  // 評価を「二郎度」という名称に変更しました
+}
+
+// ユーザー情報を格納するモデルを追加します
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique // ユーザー名は他の人と重複しないように設定
+  jiroCount    Int      @default(0) // 二郎を食べた回数。デフォルトは0
+  favoriteCall String?  // 好きなコールは任意登録
+  age          Int?     // 年齢は任意登録
+  gender       String?  // 性別は任意登録
+  createdAt    DateTime @default(now()) // ユーザー登録日
+}

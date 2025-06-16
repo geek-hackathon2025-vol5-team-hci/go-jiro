@@ -13,9 +13,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/profile")
-      .then((response) => {
-        if (!response.ok) throw new Error("Not authenticated");
+    // ログイン状態を確認するAPIを叩く
+    fetch('/api/auth/profile', {
+            credentials: 'include'
+        })
+      .then(response => {
+        if (!response.ok) {
+          // 401 Unauthorizedなどの場合は未ログインと判断
+          throw new Error('Not authenticated');
+        }
         return response.json();
       })
       .then((data) => {
@@ -29,8 +35,23 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, []); // 第2引数の空配列は「初回レンダリング時にのみ実行」を意味する
 
+  // 公開メッセージを取得するボタンの処理
+  const handleFetchMessage = () => {
+    setMessage('取得中...');
+    fetch('/api/messages')
+      .then(response => response.json())
+      .then(data => {
+        setMessage(data.message);
+      })
+      .catch(error => {
+        console.error('Error fetching public data:', error);
+        setMessage('エラーが発生しました。');
+      });
+  };
+
+  // 認証エリアのコンポーネントを定義
   const AuthArea = () => {
     if (isLoading) {
       return <p className="text-gray-700">読み込み中...</p>;
@@ -51,6 +72,12 @@ export default function Home() {
               ログアウト
             </button>
           </a>
+        <div>
+          <p>ようこそ, {user.displayName} さん</p>
+          <p>Email: {user.emails[0].value}</p>
+          <img src={user.photos[0].value} alt="プロフィール画像" width="50" />
+          <br />
+          <a href="/api/auth/logout"><button>ログアウト</button></a>
         </div>
       );
     } else {
