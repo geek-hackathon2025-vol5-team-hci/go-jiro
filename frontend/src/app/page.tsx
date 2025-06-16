@@ -14,7 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetch("/api/auth/profile")
       .then((response) => {
         if (!response.ok) throw new Error("Not authenticated");
         return response.json();
