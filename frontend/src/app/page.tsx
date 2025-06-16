@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface UserProfile {
   displayName: string;
@@ -12,6 +13,7 @@ interface UserProfile {
 export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/auth/profile")
@@ -22,11 +24,15 @@ export default function Home() {
       .then((data) => {
         if (data.user) {
           setUser(data.user);
-          // isNewUserフラグを受け取ってコンソールに出力
-          if (data.user.isNewUser) {
-            console.log('ようこそ！初回ログインです。');
-          // ここでウェルカムモーダルを表示するなどの処理を実装できます
-          }
+
+    // isNewUserフラグがあり、かつまだリダイレクトされていない場合のみ実行
+    const hasBeenRedirected = sessionStorage.getItem('newUserRedirect');
+    if (data.user.isNewUser && !hasBeenRedirected) {
+      console.log('ようこそ！初回ログインです。プロフィールページにリダイレクトします。');
+      // リダイレクトしたことをセッションストレージに記録
+      sessionStorage.setItem('newUserRedirect', 'true');
+      router.push('/profile');
+    }
         }
       })
       .catch(() => {
@@ -35,7 +41,7 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [router]);
 
   const AuthArea = () => {
     if (isLoading) {
