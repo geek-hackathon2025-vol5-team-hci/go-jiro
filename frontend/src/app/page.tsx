@@ -14,7 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetch("/api/auth/profile")
       .then((response) => {
         if (!response.ok) throw new Error("Not authenticated");
         return response.json();
@@ -52,7 +52,7 @@ export default function Home() {
             alt="プロフィール画像"
             className="w-16 h-16 rounded-full mx-auto mt-4 border-2 border-black"
           />
-          <a href="/api/logout">
+          <a href="/api/auth/logout">
             <button className="mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
               ログアウト
             </button>
