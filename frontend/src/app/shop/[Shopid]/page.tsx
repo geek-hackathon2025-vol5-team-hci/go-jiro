@@ -63,10 +63,11 @@ export default function ShopPage({ params }: { params: { Shopid: string } }) {
   const allCategories = [...new Set([...callticketOrderArr, ...callOrderArr])];
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [savedRules, setSavedRules] = useState<CallRule[]>(shop.callRules);
   const [editableRules, setEditableRules] = useState<CallRule[]>(shop.callRules);
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     return allCategories.reduce((acc, category) => {
-      const rule = editableRules.find((r) => r.category === category);
+      const rule = savedRules.find((r) => r.category === category);
       acc[category] = rule?.option || "";
       return acc;
     }, {} as Record<string, string>);
@@ -82,17 +83,17 @@ export default function ShopPage({ params }: { params: { Shopid: string } }) {
   useEffect(() => {
     const ticketParts = callticketOrderArr.map((category) => {
       const option = selections[category];
-      const rule = editableRules.find((r) => r.category === category && r.option === option);
+      const rule = savedRules.find((r) => r.category === category && r.option === option);
       return rule?.callText || "";
     });
     const toppingParts = callOrderArr.map((category) => {
       const option = selections[category];
-      const rule = editableRules.find((r) => r.category === category && r.option === option);
+      const rule = savedRules.find((r) => r.category === category && r.option === option);
       return rule?.callText || "";
     });
     setTicketText(ticketParts.filter(Boolean).join(" "));
     setToppingText(toppingParts.filter(Boolean).join(" "));
-  }, [selections, editableRules]);
+  }, [selections, savedRules]);
 
   const onChange = (category: string, option: string) => {
     setSelections((prev) => ({ ...prev, [category]: option }));
@@ -133,12 +134,22 @@ export default function ShopPage({ params }: { params: { Shopid: string } }) {
     setEditableRules((prev) => prev.filter((r) => r.id !== id));
   };
 
-  return (   
+  const handleSave = () => {
+    setSavedRules(editableRules);
+    setIsEditMode(false);
+  };
+
+  return (
     <div className="max-w-2xl mx-auto p-6 bg-yellow-100 rounded-2xl shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-yellow-900">{shop.name} のトッピング選択</h1>
         <button
-          onClick={() => setIsEditMode(!isEditMode)}
+          onClick={() => {
+            if (isEditMode) {
+              setEditableRules(savedRules);
+            }
+            setIsEditMode(!isEditMode);
+          }}
           className="text-sm bg-yellow-400 text-white py-1 px-3 rounded"
         >
           {isEditMode ? "閲覧モードに戻る" : "編集"}
@@ -204,35 +215,43 @@ export default function ShopPage({ params }: { params: { Shopid: string } }) {
       })}
 
       {isEditMode && (
-        <div className="mt-6 bg-white p-4 rounded-xl border border-yellow-300">
-          <h3 className="font-semibold mb-2 text-yellow-800">カテゴリー追加</h3>
-          <div className="flex flex-col gap-2">
-            <input
-              className="border px-3 py-2"
-              placeholder="カテゴリー名"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <input
-              className="border px-3 py-2"
-              placeholder="オプション名"
-              value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
-            />
-            <input
-              className="border px-3 py-2"
-              placeholder="コール文言（任意）"
-              value={newCallText}
-              onChange={(e) => setNewCallText(e.target.value)}
-            />
-            <button
-              onClick={handleAddCategory}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              カテゴリーを追加
-            </button>
+        <>
+          <div className="mt-6 bg-white p-4 rounded-xl border border-yellow-300">
+            <h3 className="font-semibold mb-2 text-yellow-800">カテゴリー追加</h3>
+            <div className="flex flex-col gap-2">
+              <input
+                className="border px-3 py-2"
+                placeholder="カテゴリー名"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+              <input
+                className="border px-3 py-2"
+                placeholder="オプション名"
+                value={newOption}
+                onChange={(e) => setNewOption(e.target.value)}
+              />
+              <input
+                className="border px-3 py-2"
+                placeholder="コール文言（任意）"
+                value={newCallText}
+                onChange={(e) => setNewCallText(e.target.value)}
+              />
+              <button
+                onClick={handleAddCategory}
+                className="bg-yellow-500 text-white px-4 py-2 rounded"
+              >
+                カテゴリーを追加
+              </button>
+              <button
+                onClick={handleSave}
+                className="bg-green-600 text-white px-4 py-2 rounded mt-2"
+              >
+                変更を保存
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {!isEditMode && (
