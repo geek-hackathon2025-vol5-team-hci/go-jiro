@@ -95,6 +95,11 @@ export default function Home() {
               地図ページへ移動
             </button>
           </a>
+          <a href="/shop">
+            <button className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md hover:bg-black hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-75">
+              店舗ページに移動
+            </button>
+          </a>
         </div>
       </div>
     </main>
