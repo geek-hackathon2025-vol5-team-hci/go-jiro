@@ -52,7 +52,10 @@ const mockShops: Shop[] = [
     ],
   },
 ];
-export default function ShopPage() {
+export default function ShopPage({ params }: { params: { Shopid: string } }) {
+
+
+
   const shop = mockShops[0];
 
   const callticketOrderArr = shop.callticketOrder.split(",").map((v) => v.trim());
@@ -130,7 +133,7 @@ export default function ShopPage() {
     setEditableRules((prev) => prev.filter((r) => r.id !== id));
   };
 
-  return (
+  return (   
     <div className="max-w-2xl mx-auto p-6 bg-yellow-100 rounded-2xl shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-yellow-900">{shop.name} のトッピング選択</h1>
@@ -140,6 +143,9 @@ export default function ShopPage() {
         >
           {isEditMode ? "閲覧モードに戻る" : "編集"}
         </button>
+         <p className="text-lg">
+           ここは、店舗ID: <span className="font-bold text-red-600">{params.Shopid}</span> の情報を表示するページです。
+         </p>
       </div>
 
       {allCategories.map((category) => {
