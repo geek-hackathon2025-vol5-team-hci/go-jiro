@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+
 import React, { useEffect, useState, useCallback } from "react"; //useEffectをインポート
 import {
   APIProvider,
@@ -74,8 +76,16 @@ const MapController = () => {
           }}
           onCloseClick={() => setSelectedShop(null)}
         >
-          {/*店名を表示*/}
-          <p className="font-bold text-lg text-black">{selectedShop.name}</p>
+          <div className="p-2">
+                <p className="font-bold text-lg text-black">{selectedShop.name}</p>
+                <div className="mt-2">
+                  <Link href={`/shop/${selectedShop.id}`}>
+                    <button className="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
+                      詳細を見る
+                    </button>
+                  </Link>
+                </div>
+              </div>
         </InfoWindow>
       )}
     </>
