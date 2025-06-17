@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 interface UserProfile {
   displayName: string;
@@ -13,8 +14,11 @@ export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  //APIのベースURLを.env.localから取得
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   useEffect(() => {
-    fetch("/api/auth/profile")
+    fetch(`${apiBaseUrl}/api/auth/profile`, { credentials: 'include' }) //.envを使って組み立てる。Docker環境とローカル環境両方に対応。
       .then((response) => {
         if (!response.ok) throw new Error("Not authenticated");
         return response.json();
@@ -47,12 +51,14 @@ export default function Home() {
         <div className="text-center">
           <p className="text-xl font-bold text-black">ようこそ, {user.displayName} さん</p>
           <p className="text-sm text-gray-800 mt-1">Email: {user.emails[0].value}</p>
-          <img
+          <Image
             src={user.photos[0].value}
             alt="プロフィール画像"
+            width = {64}
+            height={64}
             className="w-16 h-16 rounded-full mx-auto mt-4 border-2 border-black"
           />
-          <a href="/api/auth/logout">
+          <a href={`${apiBaseUrl}/api/auth/logout`}>
             <button className="mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
               ログアウト
             </button>
@@ -61,7 +67,7 @@ export default function Home() {
       );
     } else {
       return (
-        <a href="/api/auth/google">
+        <a href={`${apiBaseUrl}/api/auth/google`}>
           <button className="px-6 py-2 bg-black text-yellow-400 font-semibold rounded-lg shadow-md hover:bg-yellow-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-75">
             Googleでログイン
           </button>
