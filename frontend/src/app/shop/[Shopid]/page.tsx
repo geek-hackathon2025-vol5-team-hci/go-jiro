@@ -52,8 +52,10 @@ const mockShops: Shop[] = [
     ],
   },
 ];
+export default function ShopPage({ params }: { params: { Shopid: string } }) {
 
-export default function ShopPage() {
+
+
   const shop = mockShops[0];
 
   const callticketOrderArr = shop.callticketOrder.split(",").map((v) => v.trim());
@@ -152,6 +154,9 @@ export default function ShopPage() {
         >
           {isEditMode ? "閲覧モードに戻る" : "編集"}
         </button>
+         <p className="text-lg">
+           ここは、店舗ID: <span className="font-bold text-red-600">{params.Shopid}</span> の情報を表示するページです。
+         </p>
       </div>
 
       {allCategories.map((category) => {

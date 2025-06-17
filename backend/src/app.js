@@ -11,7 +11,7 @@ const app = express();
 
 // CORSは先に設定し、cookieを有効にする
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3001', // フロントエンドのローカル環境のURLを許可
   credentials: true,
 }));
 

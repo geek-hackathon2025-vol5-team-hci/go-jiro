@@ -20,17 +20,40 @@ model AccessLog {
 }
 
 // お店の情報を格納するモデル
-model Store {
-  id       Int    @id @default(autoincrement())
-  name     String
-  location String
-  jiro_value   Float  // 評価を「二郎度」という名称に変更しました
+model Shop {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String?
+  latitude  Float    // 緯度
+  longitude Float    // 経度
+  callOrder   String?
+  callRules   CallRule[] 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  jiro_difficulty Int //次郎難易度
 }
+
+model CallRule {
+  id        Int      @id @default(autoincrement())
+  shopId    Int      // どの店舗のルールかを示すID
+  category  String   // カテゴリ (例: "ヤサイ", "ニンニク")
+  option    String   // 選択肢 (例: "少なめ", "多め（マシ）")
+  callText  String   // 出力されるコール文言 (例: "ヤサイスクナメ")
+  
+  // Shopモデルとのリレーションを定義
+  shop      Shop     @relation(fields: [shopId], references: [id])
+
+  @@unique([shopId, category, option]) // 同じ店の同じルールの重複を防ぐ
+}
+
 
 // ユーザー情報を格納するモデルを追加します
 model User {
   id           Int      @id @default(autoincrement())
-  username     String   @unique // ユーザー名は他の人と重複しないように設定
+  googleId    String   @unique // Googleから提供されるユニークなID
+  email        String   @unique
+  displayName String?
+  username     String?  @unique // ユーザー名は他の人と重複しないように設定
   jiroCount    Int      @default(0) // 二郎を食べた回数。デフォルトは0
   favoriteCall String?  // 好きなコールは任意登録
   age          Int?     // 年齢は任意登録
