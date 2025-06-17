@@ -5,7 +5,13 @@ exports.googleCallback = (req, res) => {
 };
 
 exports.getProfile = (req, res) => {
-  if (req.isAuthenticated()) { // 
+  if (req.isAuthenticated()) {
+    // ★★★【デバッグログ②】★★★
+    // セッションから取り出したユーザー情報にisNewUserフラグがあるか確認
+    console.log('[DEBUG] /api/auth/profile: Returning user data from session:', {
+        displayName: req.user.displayName,
+        isNewUser: req.user.isNewUser
+    });
     res.json({ user: req.user }); // 
   } else {
     res.status(401).json({ user: null }); // 

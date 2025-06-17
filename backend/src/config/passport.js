@@ -40,6 +40,14 @@ passport.use(new GoogleStrategy({
         userProfile = { ...profile, isNewUser: true };
       }
 
+      // ★★★【デバッグログ①】★★★
+      // isNewUserフラグが正しく設定されているか確認
+      console.log('[DEBUG] Passport: Setting user profile in session:', {
+        displayName: userProfile.displayName,
+        isNewUser: userProfile.isNewUser,
+      });
+      
+
       // 4. フラグが付与されたプロフィール情報を次の処理に渡す
       return done(null, userProfile);
 

@@ -1,22 +1,7 @@
+//shop/[Shopid]/ShopPageComponent.tsx
 "use client";
 import React, { useState, useEffect } from "react";
-
-// 型定義
-type CallRule = {
-  id: number;
-  shopId: number;
-  category: string;
-  option: string;
-  callText: string;
-};
-
-type Shop = {
-  id: number;
-  name: string;
-  callticketOrder: string;
-  callOrder: string;
-  callRules: CallRule[];
-};
+import { Shop, CallRule } from './types';
 
 // コンポーネントが受け取るpropsの型定義
 interface ShopPageComponentProps {

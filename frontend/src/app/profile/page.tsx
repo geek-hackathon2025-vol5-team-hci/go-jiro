@@ -14,6 +14,8 @@ interface UserProfile {
   photos: { value: string }[];
 }
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // ユーザー情報を取得するAPIを叩く
-    fetch("/api/auth/profile")
+    fetch(`${apiBaseUrl}/api/auth/profile`, { credentials: 'include' })
       .then((response) => {
         // 認証されていない場合はエラーを投げ、catchブロックで処理する
         if (!response.ok) {
