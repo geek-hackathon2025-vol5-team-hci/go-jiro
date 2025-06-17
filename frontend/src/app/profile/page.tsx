@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 
 // ユーザープロフィールの型定義
@@ -64,9 +65,11 @@ export default function ProfilePage() {
         </h1>
         {user && (
           <div className="text-center">
-            <img
+            <Image
               src={user.photos[0].value}
               alt="プロフィール画像"
+              width = {64}
+              height = {64}
               className="w-24 h-24 rounded-full mx-auto my-4 border-4 border-black"
             />
             <h2 className="text-2xl font-bold text-black">{user.displayName}</h2>
