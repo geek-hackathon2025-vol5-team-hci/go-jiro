@@ -4,6 +4,7 @@ export type CallRule = {
   category: string;
   option: string;
   callText: string;
+  optionOrder?: number;// オプション: 呼び出し順序
 };
 
 export type Shop = {
