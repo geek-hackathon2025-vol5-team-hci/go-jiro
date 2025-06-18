@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 
 interface UserProfile {
@@ -26,15 +27,19 @@ export default function Home() {
         return response.json();
       })
       .then((data) => {
+        // ★★★【デバッグログ③】★★★
+        // バックエンドから受け取ったデータ全体を確認
+        console.log('[DEBUG] Frontend: Received data from /api/auth/profile:', data);
+
         if (data.user) {
           setUser(data.user);
 
-    // isNewUserフラグがあり、かつまだリダイレクトされていない場合のみ実行
-    const hasBeenRedirected = sessionStorage.getItem('newUserRedirect');
+          // isNewUserフラグがあり、かつまだリダイレクトされていない場合、ブラウザ上にキーを保存しておく。
+          const hasBeenRedirected = sessionStorage.getItem('newUserRedirect');
     if (data.user.isNewUser && !hasBeenRedirected) {
       console.log('ようこそ！初回ログインです。プロフィールページにリダイレクトします。');
       // リダイレクトしたことをセッションストレージに記録
-      sessionStorage.setItem('newUserRedirect', 'true');
+      //sessionStorage.setItem('newUserRedirect', 'true');
       router.push('/profile');
     }
         }
@@ -45,7 +50,7 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [router]);
+  }, [router, apiBaseUrl]);
 
   const AuthArea = () => {
     if (isLoading) {
@@ -64,20 +69,20 @@ export default function Home() {
             height={64}
             className="w-16 h-16 rounded-full mx-auto mt-4 border-2 border-black"
           />
-          <a href={`${apiBaseUrl}/api/auth/logout`}>
+          <Link href={`${apiBaseUrl}/api/auth/logout`}>
             <button className="mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
               ログアウト
             </button>
-          </a>
+          </Link>
         </div>
       );
     } else {
       return (
-        <a href={`${apiBaseUrl}/api/auth/google`}>
+        <Link href={`${apiBaseUrl}/api/auth/google`}>
           <button className="px-6 py-2 bg-black text-yellow-400 font-semibold rounded-lg shadow-md hover:bg-yellow-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-75">
             Googleでログイン
           </button>
-        </a>
+        </Link>
       );
     }
   };
@@ -96,16 +101,16 @@ export default function Home() {
         <hr className="my-6 border-black" />
 
         <div className="text-center">
-          <a href="/map">
+          <Link href="/map">
             <button className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md hover:bg-black hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-75">
               地図ページへ移動
             </button>
-          </a>
-          <a href="/shop">
+          </Link>
+          <Link href="/shop">
             <button className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md hover:bg-black hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-75">
               店舗ページに移動
             </button>
-          </a>
+          </Link>
         </div>
       </div>
     </main>

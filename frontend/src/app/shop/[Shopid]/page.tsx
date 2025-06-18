@@ -1,22 +1,6 @@
-import { resolve } from 'path';
 import ShopPageComponent from './ShopPageComponent';
+import { Shop } from './types'; 
 
-// モックデータと型定義
-type CallRule = {
-  id: number;
-  shopId: number;
-  category: string;
-  option: string;
-  callText: string;
-};
-
-type Shop = {
-  id: number;
-  name: string;
-  callticketOrder: string;
-  callOrder: string;
-  callRules: CallRule[];
-};
 
 const mockShops: Shop[] = [
   {

@@ -14,6 +14,8 @@ interface UserProfile {
   photos: { value: string }[];
 }
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // ユーザー情報を取得するAPIを叩く
-    fetch("/api/auth/profile")
+    fetch(`${apiBaseUrl}/api/auth/profile`, { credentials: 'include' })
       .then((response) => {
         // 認証されていない場合はエラーを投げ、catchブロックで処理する
         if (!response.ok) {
@@ -88,11 +90,11 @@ export default function ProfilePage() {
                   ホームへ戻る
                 </button>
               </Link>
-              <a href="/api/auth/logout">
+              <Link href={`${apiBaseUrl}/api/auth/logout`}>
                 <button className="w-full mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
                   ログアウト
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
         )}

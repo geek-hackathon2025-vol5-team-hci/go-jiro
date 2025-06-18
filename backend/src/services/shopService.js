@@ -1,6 +1,6 @@
 // backend/src/services/shopService.js
-
-const axios = require('axios');
+// Google Places API (New) を使用して店舗情報を検索するサービス
+const axios = require('axios'); // axiosを使用してHTTPリクエストを送信
 
 // Places API (New) の searchText エンドポイント
 const PLACES_API_NEW_URL = 'https://places.googleapis.com/v1/places:searchText';
@@ -37,22 +37,34 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': process.env.Maps_API_KEY,
-          'X-Goog-FieldMask': 'places.id,places.displayName,places.location,places.shortFormattedAddress',
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.location,places.shortFormattedAddress,places.photos',
         },
       }
     );
 
+    // レスポンスのデータが正しいか確認
     if (!response.data || !response.data.places) {
       return [];
     }
 
-    const shops = response.data.places.map((place) => ({
-      id: place.id,
-      name: place.displayName.text,
-      latitude: place.location.latitude,
-      longitude: place.location.longitude,
-      address: place.shortFormattedAddress,
-    }));
+    // 取得した店舗情報を整形、json形式で返す
+    const shops = response.data.places.map((place) => {
+      let photoUrl = null;
+
+      if (place.photos && place.photos.length > 0) {
+        const photoResourceName = place.photos[0].name;
+        photoUrl = `https://maps.googleapis.com/vi/${photoResourceName}/media?maxHeightPx=400&key=${process.env.Maps_API_KEY}`;
+      }
+
+      return {
+        id: place.id, // 店舗のID
+        name: place.displayName.text, // 店舗名
+        latitude: place.location.latitude, // 緯度
+        longitude: place.location.longitude, // 経度
+        address: place.shortFormattedAddress, // 住所
+        photoUrl: photoUrl, // 写真のURL
+      };
+    });
 
     return shops;
 
