@@ -53,7 +53,7 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
 
       if (place.photos && place.photos.length > 0) {
         const photoResourceName = place.photos[0].name;
-        photoUrl = `https://maps.googleapis.com/vi/${photoResourceName}/media?maxHeightPx=400&key=${process.env.Maps_API_KEY}`;
+        photoUrl = `https://places.googleapis.com/v1/${photoResourceName}/media?maxHeightPx=400&key=${process.env.Maps_API_KEY}`;
       }
 
       return {
@@ -62,7 +62,7 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         latitude: place.location.latitude, // 緯度
         longitude: place.location.longitude, // 経度
         address: place.shortFormattedAddress, // 住所
-        photoUrl: photoUrl, // 写真のURL
+        photo: photoUrl, // 写真のURL
       };
     });
 
