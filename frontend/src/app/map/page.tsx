@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 import React, { useEffect, useState, useCallback } from "react"; //useEffectをインポート
 import {
@@ -18,7 +19,29 @@ type Shop = {
   latitude: number;
   longitude: number;
   address?: string;
+  photo?: string; // 画像URL
 };
+
+const ShopCard = ({ shop }: { shop: Shop }) => {
+  return (
+    <div className="p-4 border rounded-lg shadow-md bg-white">
+      <h2 className="text-xl font-bold">{shop.name}</h2>
+      {shop.photo && (
+        <Image 
+        src={shop.photo} 
+        alt={shop.name} 
+        className="w-full h-48 object-cover rounded-md mt-2" 
+        />
+      )}
+      <p className="text-black-100 mt-2">{shop.address}</p>
+      <Link href={`/shop/${shop.id}`}>
+        <button className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
+          詳細を見る
+        </button>
+      </Link>
+    </div>
+  );
+}
 
 // Mapコンポーネントを子コンポーネントとして分離
 // これにより、APIProviderの外でuseStateやuseEffectを使えるようになる
@@ -29,8 +52,8 @@ const MapController = () => {
 
   //検索する関数
   const handleSearch = useCallback(async (keyword: string) => {
-    if (!map) return;
-    const center = map.getCenter();
+    if (!map) return; //マップがまだロードされていない場合は何もしない
+    const center = map.getCenter(); //中心座標を取得
     if (!center) return;
     const lat = center.lat();
     const lng = center.lng();
@@ -76,16 +99,7 @@ const MapController = () => {
           }}
           onCloseClick={() => setSelectedShop(null)}
         >
-          <div className="p-2">
-                <p className="font-bold text-lg text-black">{selectedShop.name}</p>
-                <div className="mt-2">
-                  <Link href={`/shop/${selectedShop.id}`}>
-                    <button className="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
-                      詳細を見る
-                    </button>
-                  </Link>
-                </div>
-              </div>
+          <ShopCard shop={selectedShop} />
         </InfoWindow>
       )}
     </>

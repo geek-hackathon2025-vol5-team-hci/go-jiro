@@ -90,11 +90,11 @@ export default function ProfilePage() {
                   ホームへ戻る
                 </button>
               </Link>
-              <a href="/api/auth/logout">
+              <Link href={`${apiBaseUrl}/api/auth/logout`}>
                 <button className="w-full mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
                   ログアウト
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
         )}
