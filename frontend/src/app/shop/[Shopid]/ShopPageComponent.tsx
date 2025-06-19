@@ -1,4 +1,4 @@
-// ShopPageComponent.tsx
+// /shop/[Shopid]/ShopPageComponent.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -86,11 +86,11 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         <>
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-2 text-yellow-800">現在の券売機コール文言</h2>
-            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200">{ticketText || "コールの必要なし"}</p>
+            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200 text-black">{ticketText || "コールの必要なし"}</p>
           </div>
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-2 text-yellow-800">現在の無料トッピングコール文言</h2>
-            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200">{toppingText || "そのまま"}</p>
+            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200 text-black">{toppingText || "そのまま"}</p>
           </div>
         </>
       )}

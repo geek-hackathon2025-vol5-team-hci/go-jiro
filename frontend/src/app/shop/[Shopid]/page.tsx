@@ -38,9 +38,9 @@ const mockShops: Shop[] = [
   },
 ];
 
-export default async function ShopPage(props: {params: Promise<{id:string}>}) {
+export default async function ShopPage(props: {params: Promise<{Shopid:string}>}) {
   const resolvedParams = await props.params;
-  const shopId = resolvedParams.id;
+  const shopId = resolvedParams.Shopid;
 
   // 本来は shopId を使ってデータベースなどから非同期に店舗情報を取得します。
   // 今回はモックデータを使用するため、常に最初の店舗データを取得します。

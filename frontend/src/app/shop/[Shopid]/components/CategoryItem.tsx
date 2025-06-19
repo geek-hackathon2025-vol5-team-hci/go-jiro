@@ -129,7 +129,7 @@ export const CategoryItem = ({
           {activeAddFormCategory === category && (
             <div className="my-2 flex flex-col gap-2 p-2 bg-blue-50 rounded-md">
               <input
-                className="border px-2 py-1 text-sm"
+                className="border px-2 py-1 text-sm text-zinc-500"
                 placeholder="新しいオプション名"
                 value={newOptions[category]?.option || ""}
                 onChange={(e) =>
@@ -140,7 +140,7 @@ export const CategoryItem = ({
                 }
               />
               <input
-                className="border px-2 py-1 text-sm"
+                className="border px-2 py-1 text-sm text-zinc-500"
                 placeholder="コール文言（任意）"
                 value={newOptions[category]?.callText || ""}
                 onChange={(e) =>
@@ -189,7 +189,7 @@ export const CategoryItem = ({
                   <SortableOptionItem id={id} disabled={!isEditMode}>
                     {/* activeEditIdが現在のオプションIDと一致する場合、インライン編集フォームを表示 */}
                     {activeEditId === id ? (
-                      <div ref={editorRef} className="flex items-center gap-2">
+                      <div ref={editorRef} className="flex items-center gap-2 text-black">
                         <input
                           className="border px-2 py-1 text-sm"
                           value={option}
@@ -210,7 +210,7 @@ export const CategoryItem = ({
                     ) : (
                       // 通常はオプション名のみ表示。クリックで編集フォームに切り替え
                       <div
-                        className="cursor-pointer"
+                        className="cursor-pointer text-black"
                         onClick={() => setActiveEditId(id)}
                       >
                         <span>{option}</span>
@@ -219,7 +219,7 @@ export const CategoryItem = ({
                   </SortableOptionItem>
                 ) : (
                   // 【閲覧モード】選択可能なラジオボタンとして表示
-                  <label className="flex items-center gap-2 cursor-pointer p-2">
+                  <label className="flex items-center gap-2 cursor-pointer p- text-black">
                     <input
                       type="radio"
                       name={category}
