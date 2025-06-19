@@ -2,7 +2,7 @@
 import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-    images: {
+  images: {
     remotePatterns: [
       {
         protocol: 'https',
@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       
     ],
   },
-  //特定のパスへのアクセスをバックエンドにプロキシ（転送）する
+  // 特定のパスへのアクセスをバックエンドにプロキシ（転送）する
   async rewrites() {
     return [
       {
