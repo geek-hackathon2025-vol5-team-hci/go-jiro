@@ -10,12 +10,14 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
+
+            {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        hostname: 'lh3.googleusercontent.com', // プロフィール画像用
         port: '',
         pathname: '/**',
       },
+      
     ],
   },
   // 特定のパスへのアクセスをバックエンドにプロキシ（転送）する
