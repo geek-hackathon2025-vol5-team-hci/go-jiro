@@ -2,7 +2,7 @@
 import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-    images: {
+  images: {
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,9 +10,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
-  //特定のパスへのアクセスをバックエンドにプロキシ（転送）する
+  // 特定のパスへのアクセスをバックエンドにプロキシ（転送）する
   async rewrites() {
     return [
       {
