@@ -27,6 +27,47 @@ const getShops = async (req, res, next) => {
   }
 };
 
+/**
+ * 店舗IDに基づいて店舗情報を取得するための新しい関数
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+const getShopById = async (req, res, next) => {
+  try {
+    const { shopId } = req.params;
+
+    // Prismaを使ってShopテーブルからデータを取得
+    // 関連するcallRulesも一緒に取得するためにincludeを使用します
+    const shop = await prisma.shop.findUnique({
+      where: {
+        id: shopId, // URLから受け取ったIDを使用
+      },
+      include: {
+        callRules: { // 関連するコールルールも全て取得
+          orderBy: {
+            optionOrder: 'asc', // optionOrderでソート
+          },
+        },
+      },
+    });
+
+    if (!shop) {
+      // 店舗が見つからない場合は404エラーを返す
+      return res.status(404).json({ message: 'Shop not found' });
+    }
+
+    // 取得した店舗情報をJSONで返す
+    res.json(shop);
+
+  } catch (error) {
+    // エラーハンドリング
+    console.error('Error fetching shop by ID:', error);
+    next(error);
+  }
+};
+
+
 
 /**
  * 店舗情報を更新するための新しい関数
@@ -99,5 +140,6 @@ try {
 
 module.exports = {
   getShops,
+  getShopById,
   updateShop,
 };

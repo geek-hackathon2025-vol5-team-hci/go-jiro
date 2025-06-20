@@ -1,14 +1,14 @@
 export type CallRule = {
   id: number;
-  shopId: number;
+  shopId: string; 
   category: string;
   option: string;
   callText: string;
-  optionOrder?: number;// オプション: 呼び出し順序
+  optionOrder?: number;
 };
 
 export type Shop = {
-  id: number;
+  id: string;
   name: string;
   callticketOrder: string;
   callOrder: string;
