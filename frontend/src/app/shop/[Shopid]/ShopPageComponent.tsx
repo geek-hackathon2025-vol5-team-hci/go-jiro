@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Shop } from "./types";
 import { useShopEditor } from "./hooks/useShopEditor";
 import { CategoryList } from "./components/CategoryList";
@@ -45,6 +46,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
   }, [selections, editor]);
 
   return (
+    <>
     <div className="max-w-2xl mx-auto p-6 bg-yellow-100 rounded-2xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-yellow-900">{shop.name} のトッピング選択</h1>
@@ -94,6 +96,16 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
           </div>
         </>
       )}
-    </div>
+
+      </div>
+
+      <div className = "mt-8 border-t pt-6 pb-6 text-center">
+        <Link href = "/map">
+          <button className = "font-sans bg-white text-black text-2xl px-12 py-4 rounded-lg shadow-md hover:bg-gray-300">
+            地図に戻る
+          </button>
+        </Link>
+      </div>
+    </>
   );
 }
