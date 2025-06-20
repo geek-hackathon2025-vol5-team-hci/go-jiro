@@ -32,6 +32,7 @@ async function getShopData(shopId: string): Promise<Shop | null> {
 }
 
 export default async function ShopPage(props: {params: Promise<{Shopid:string}>}) {
+  console.log('params:', props.params);
   const resolvedParams = await props.params;
   const shopId = resolvedParams.Shopid;
 

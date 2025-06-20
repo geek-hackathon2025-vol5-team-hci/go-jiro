@@ -7,49 +7,70 @@ import { Shop } from "./types";
 import { useShopEditor } from "./hooks/useShopEditor";
 import { CategoryList } from "./components/CategoryList";
 
+
 interface ShopPageComponentProps {
   shop: Shop;
   shopId: string;
 }
 
-export default function ShopPageComponent({ shop, shopId }: ShopPageComponentProps) {
+export default function ShopPageComponent({
+  shop,
+  shopId,
+}: ShopPageComponentProps) {
   // すべてのロジックと状態をカスタムフックから受け取る
   const editor = useShopEditor(shop, shopId);
-  
+
   // 表示用のState
   const [selections, setSelections] = useState<Record<string, string>>(() => {
-    const allCategories = [...new Set([...editor.savedTicketCategories, ...editor.savedToppingCategories])];
+    const allCategories = [
+      ...new Set([
+        ...editor.savedTicketCategories,
+        ...editor.savedToppingCategories,
+      ]),
+    ];
     return allCategories.reduce((acc, category) => {
       const rule = editor.savedRules.find((r) => r.category === category);
       acc[category] = rule?.option || "";
       return acc;
     }, {} as Record<string, string>);
   });
-  
+
   const [ticketText, setTicketText] = useState("");
   const [toppingText, setToppingText] = useState("");
 
   // コール文言の生成ロジック
   useEffect(() => {
-    const rulesToUse = editor.isEditMode ? editor.editableRules : editor.savedRules;
-    const ticketCategories = editor.isEditMode ? editor.editableTicketCategories : editor.savedTicketCategories;
-    const toppingCategories = editor.isEditMode ? editor.editableToppingCategories : editor.savedToppingCategories;
+    const rulesToUse = editor.isEditMode
+      ? editor.editableRules
+      : editor.savedRules;
+    const ticketCategories = editor.isEditMode
+      ? editor.editableTicketCategories
+      : editor.savedTicketCategories;
+    const toppingCategories = editor.isEditMode
+      ? editor.editableToppingCategories
+      : editor.savedToppingCategories;
 
     const getCallText = (category: string) => {
       const option = selections[category];
-      const rule = rulesToUse.find(r => r.category === category && r.option === option);
+      const rule = rulesToUse.find(
+        (r) => r.category === category && r.option === option
+      );
       return rule?.callText || "";
     };
 
     setTicketText(ticketCategories.map(getCallText).filter(Boolean).join(" "));
-    setToppingText(toppingCategories.map(getCallText).filter(Boolean).join(" "));
+    setToppingText(
+      toppingCategories.map(getCallText).filter(Boolean).join(" ")
+    );
   }, [selections, editor]);
 
   return (
     <>
     <div className="max-w-2xl mx-auto p-6 bg-yellow-100 rounded-2xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-yellow-900">{shop.name} のトッピング選択</h1>
+        <h1 className="text-2xl font-bold text-yellow-900">
+          {shop.name} のトッピング選択
+        </h1>
         <button
           onClick={() => editor.setIsEditMode(!editor.isEditMode)}
           className="text-sm bg-yellow-400 text-white py-1 px-3 rounded w-28 text-center hover:bg-yellow-500"
@@ -65,7 +86,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         selections={selections}
         setSelections={setSelections}
       />
-      
+
       <CategoryList
         title="無料トッピングコール"
         type="topping"
