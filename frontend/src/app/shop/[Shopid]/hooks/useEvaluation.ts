@@ -5,6 +5,11 @@ import { useState } from 'react';
 import { Shop, Ratings, EVALUATION_FACTORS } from '../types';
 import { useRouter } from 'next/navigation';
 
+interface EvaluationPayload{
+  shopId: string;
+  comment: string;
+  [key: string]: number | string;
+}
 export const useEvaluation = (shop: Shop) => {
   const initialRatings = Object.fromEntries(
     EVALUATION_FACTORS.map(factor => [factor.key, 0])
@@ -27,7 +32,7 @@ export const useEvaluation = (shop: Shop) => {
     
     setIsSubmitting(true);
 
-    const payload: { [key: string]: any } = {
+    const payload: EvaluationPayload = {
       shopId: shop.id,
       comment,
     };

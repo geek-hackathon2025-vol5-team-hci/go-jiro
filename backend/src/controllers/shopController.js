@@ -148,7 +148,7 @@ try {
     const { callticketOrder, callOrder, callRules, name, address, latitude, longitude } = req.body;
 
 // 2. バリデーション
-    if (!shopId || !callticketOrder || !callOrder || !Array.isArray(callRules)) {
+    if (!shopId || !Array.isArray(callRules)) {
       return res.status(400).json({ message: 'リクエストデータが不足しています。' });
     }
 

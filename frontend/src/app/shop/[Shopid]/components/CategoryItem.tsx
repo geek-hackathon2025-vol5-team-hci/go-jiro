@@ -18,7 +18,7 @@ interface CategoryItemProps {
   setSelections: (value: React.SetStateAction<Record<string, string>>) => void;
   activeEditId: number | null;
   setActiveEditId: (id: number | null) => void;
-  onCategoryChange: (id: number, newCategory: string) => void;
+  // onCategoryChange: (id: number, newCategory: string) => void; // ←未使用のためコメントアウト
   onOptionChange: (id: number, value: string) => void;
   onCallTextChange: (id: number, value: string) => void;
   handleDeleteOption: (id: number) => void;
@@ -33,7 +33,7 @@ interface CategoryItemProps {
 
 export const CategoryItem = ({
   category, isEditMode, rules, selections, setSelections,
-  activeEditId, setActiveEditId, onCategoryChange, onOptionChange,
+  activeEditId, setActiveEditId, /* onCategoryChange, */ onOptionChange,
   onCallTextChange, handleDeleteOption, handleOptionDragEnd,
   activeAddFormCategory, setActiveAddFormCategory, newOptions,
   setNewOptions, handleAddOptionInline, onCategoryNameChange,
