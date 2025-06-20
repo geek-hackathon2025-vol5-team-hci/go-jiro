@@ -41,6 +41,10 @@ export default function Home() {
       // リダイレクトしたことをセッションストレージに記録
       //sessionStorage.setItem('newUserRedirect', 'true');
       router.push('/profile');
+    }else{
+      // 通常ログインの場合は地図ページへ
+      console.log('ログイン済みです。マップページにリダイレクトします。');
+      router.push('/map');
     }
         }
       })

@@ -71,14 +71,24 @@ const CloseIcon = () => (
 //ショップをリストで表示
 const ShopList = ({ shops, selectedShop, onShopSelect, onClose }: { shops: Shop[], selectedShop: Shop | null, onShopSelect: (shop: Shop | null) => void, onClose: () => void }) => {
   return (
-    <div className="w-80 h-full bg-white p-4 shadow-lg border-r">
-      <div className = "flex justify-between items-center mb-4">
+    // (★★★) レイアウト崩れを防ぐためflexとflex-colを追加
+    <div className="w-80 h-full bg-white p-4 shadow-lg border-r flex flex-col">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-black text-2xl font-bold">店舗リスト</h2>
         <button onClick={onClose} className="">
-            <CloseIcon />
+          <CloseIcon />
         </button>
       </div>
-      <ul>
+      {/* (★★★) プロフィールページへのリンクボタンを追加 */}
+      <div className="mb-4">
+        <Link href="/profile">
+          <button className="w-full px-4 py-2 bg-gray-200 text-black font-semibold rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75">
+            プロフィール
+          </button>
+        </Link>
+      </div>
+      {/* (★★★) リストが長くなった場合でもスクロールできるように修正 */}
+      <ul className="flex-grow overflow-y-auto">
         {shops.map((shop) => (
           <li
             key={shop.id}
