@@ -159,8 +159,8 @@ try {
       const shopData = {
         id: shopId,
         name: name || '店舗名不明', // フロントエンドからnameなども渡す必要がある
-        callticketOrder,
-        callOrder,
+        callticketOrder : callticketOrder || '', // フロントエンドから渡されない場合は空文字列
+        callOrder ,
         // 必要に応じて他の店舗情報もここで設定
         latitude: latitude || 0,
         longitude: longitude || 0,
