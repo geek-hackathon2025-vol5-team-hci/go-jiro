@@ -159,8 +159,8 @@ try {
       const shopData = {
         id: shopId,
         name: name || '店舗名不明', // フロントエンドからnameなども渡す必要がある
-        callticketOrder : callticketOrder || '', // フロントエンドから渡されない場合は空文字列
-        callOrder ,
+        callticketOrder ,
+        callOrder,
         // 必要に応じて他の店舗情報もここで設定
         latitude: latitude || 0,
         longitude: longitude || 0,
@@ -168,12 +168,9 @@ try {
       };
 
       const upsertShop = await tx.shop.upsert({
-        where: { id: shopId },
-        update: {
-          callticketOrder: callticketOrder || 'リョウ,カタサ',
-          callOrder: callOrder || 'ヤサイ,アブラ,ニンニク',
-        },
-        create: shopData,
+        where: { id: shopId }, // 条件
+        update: { callticketOrder, callOrder }, // 見つかった時、この二つの項目を更新
+        create: shopData, // ないとき、新規作成
       });
 
       // 3-2. 既存のCallRuleをすべて削除
