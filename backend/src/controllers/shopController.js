@@ -37,51 +37,51 @@ const updateShop = async(req, res, next) =>{
 try {
 // 1. リクエストからデータを取得
     // shopIdは文字列なので、整数に変換する
-    const shopId = parseInt(req.params.shopId, 10);
-    const { callticketOrder, callOrder, callRules } = req.body;
+    const { shopId } = req.params;
+    const { callticketOrder, callOrder, callRules, name, address, latitude, longitude } = req.body;
 
 // 2. バリデーション
-    if (isNaN(shopId)) {
-      return res.status(400).json({ message: '無効な店舗IDです。' });
-    }
-    if (!callticketOrder || !callOrder || !Array.isArray(callRules)) {
+    if (!shopId || !callticketOrder || !callOrder || !Array.isArray(callRules)) {
       return res.status(400).json({ message: 'リクエストデータが不足しています。' });
     }
 
-    // 2. ひとまず成功したことを示す簡単なメッセージを返す
-    //    今後のステップで、ここでデータベースの更新処理を実装します。
-    res.status(200).json({ 
-      message: `Shop ${shopId} updated successfully.`,
-      receivedData: updateData // 確認用に受け取ったデータをそのまま返す
-    });
-
     // 3. データベース更新処理。すべての更新が完了したらデータベースにコミットする(transaction)
     const updatedShop = await prisma.$transaction(async (tx) => {
-      // 3-1. Shopテーブルの並び順文字列を更新
-      const shopUpdate = tx.shop.update({
-        where: { id: shopId },
-        data: {
-          callticketOrder,
-          callOrder,
-        },
+      
+      // 3-1. Shop情報を更新または作成 (upsert = データがあれば更新(update), なければ挿入(insert))
+      const shopData = {
+        id: shopId,
+        name: name || '店舗名不明', // フロントエンドからnameなども渡す必要がある
+        callticketOrder,
+        callOrder,
+        // 必要に応じて他の店舗情報もここで設定
+        latitude: latitude || 0,
+        longitude: longitude || 0,
+        jiro_difficulty: 0, // 仮の値
+      };
+
+      const upsertShop = await tx.shop.upsert({
+        where: { id: shopId }, // 条件
+        update: { callticketOrder, callOrder }, // 見つかった時、この二つの項目を更新
+        create: shopData, // ないとき、新規作成
       });
 
       // 3-2. 既存のCallRuleをすべて削除
-      // shopIdに紐づく古いルールを一旦消去する
-      const deleteRules = tx.callRule.deleteMany({
+      await tx.callRule.deleteMany({
         where: { shopId: shopId },
       });
 
       // 3-3. 新しいCallRuleを作成
-      // フロントエンドから送られてきたcallRules配列を元に新しいルールを作成する
-      // この時、idやshopIdはDB側で自動採番・設定されるので不要なデータを除く
-      const createRules = tx.callRule.createMany({
-        data: callRules.map(({ id, shopId: ruleShopId, ...rule }) => rule),
-      });
-      
-      // 上記の3つの処理を同時に実行
-      const [updatedShopData] = await Promise.all([shopUpdate, deleteRules, createRules]);
-      return updatedShopData;
+      if (callRules.length > 0) {
+        await tx.callRule.createMany({
+          data: callRules.map(({ id, shopId: ruleShopId, ...rule }) => ({
+            ...rule,
+            shopId: shopId, // どのShopに紐づくかIDをセット
+          })),
+        });
+      }
+
+      return upsertShop;
     });
 
         // 4. 成功レスポンスを返す
