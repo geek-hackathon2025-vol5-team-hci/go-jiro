@@ -23,8 +23,16 @@ export default async function EvaluationPage(props: { params: { Shopid: string }
   const shopId = props.params.Shopid;
   const shop = await getShopData(shopId);
 
+  // 店舗が見つからない場合の表示
   if (!shop) {
-    return <div>店舗が見つかりません</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-yellow-100">
+        <div className="text-center p-8 bg-white rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">店舗が見つかりません</h1>
+          <p className="text-gray-700">ID: {shopId}</p>
+        </div>
+      </div>
+    );
   }
 
   return <EvaluationPageComponent shop={shop} />;
