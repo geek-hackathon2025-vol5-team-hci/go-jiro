@@ -115,6 +115,17 @@ export default function ShopPageComponent({
             <h2 className="text-xl font-semibold mb-2 text-yellow-800">現在の無料トッピングコール文言</h2>
             <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200 text-black">{toppingText || "そのまま"}</p>
           </div>
+          <div className="mt-8 text-center">
+            {/* ▼▼▼ 変更箇所 ▼▼▼ */}
+            <Link 
+              href={`/visiting?shopId=${shopId}&shopName=${encodeURIComponent(shop.name)}&ticketText=${encodeURIComponent(ticketText)}&toppingText=${encodeURIComponent(toppingText)}`}
+            >
+              <button className="font-sans bg-red-500 text-white text-2xl px-12 py-4 rounded-lg shadow-md hover:bg-red-700">
+                この店に来店する
+              </button>
+            </Link>
+            {/* ▲▲▲ 変更箇所 ▲▲▲ */}
+          </div>
         </>
       )}
 
