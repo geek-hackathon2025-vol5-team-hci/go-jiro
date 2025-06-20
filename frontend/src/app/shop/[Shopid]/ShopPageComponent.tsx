@@ -52,7 +52,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         <h1 className="text-2xl font-bold text-yellow-900">{shop.name} のトッピング選択</h1>
         <button
           onClick={() => editor.setIsEditMode(!editor.isEditMode)}
-          className="text-sm bg-yellow-400 text-white py-1 px-3 rounded w-28 text-center"
+          className="text-sm bg-yellow-400 text-white py-1 px-3 rounded w-28 text-center hover:bg-yellow-500"
         >
           {editor.isEditMode ? "閲覧モードに戻る" : "編集"}
         </button>
