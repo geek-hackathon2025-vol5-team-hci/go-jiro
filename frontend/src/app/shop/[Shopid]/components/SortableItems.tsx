@@ -1,4 +1,4 @@
-// components/SortableItems.tsx
+// frontend/src/app/shop/[Shopid]/components/SortableItems.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
