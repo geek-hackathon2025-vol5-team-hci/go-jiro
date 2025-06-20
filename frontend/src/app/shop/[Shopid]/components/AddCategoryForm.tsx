@@ -25,14 +25,14 @@ export const AddCategoryForm = ({
           placeholder="新しいカテゴリー名"
           value={newCategoryName}
           onChange={(e) => setNewCategoryName(e.target.value)}
-          className="border px-2 py-1"
+          className="border-2 border-zinc-500 px-2 py-1 placeholder:text-gray-400 text-black"
         />
         <input
           type="text"
           placeholder="最初のオプション名"
           value={newFirstOption}
           onChange={(e) => setNewFirstOption(e.target.value)}
-          className="border px-2 py-1"
+          className="border-2 border-zinc-500 px-2 py-1 placeholder:text-gray-400 text-black"
         />
         <div className="flex gap-2 mt-2">
           <button

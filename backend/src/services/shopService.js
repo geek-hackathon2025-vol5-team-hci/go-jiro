@@ -4,6 +4,8 @@ const axios = require('axios'); // axiosを使用してHTTPリクエストを送
 
 // Places API (New) の searchText エンドポイント
 const PLACES_API_NEW_URL = 'https://places.googleapis.com/v1/places:searchText';
+//エンドポイントのベースURL
+const PLACES_API_DETAILS_URL = 'https://places.googleapis.com/v1/places/';
 
 /**
  * Google Places API (New) の searchText を使って店舗情報を検索する
@@ -78,6 +80,50 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
   }
 };
 
+
+/**
+ * Google Places API (Details) を使って単一の店舗詳細を取得する
+ * @param {string} placeId - Google Place ID
+ * @returns {Promise<{name: string, latitude: number, longitude: number} | null>} 店舗情報、またはnull
+ */
+const getShopDetailsFromGoogle = async (placeId) => {
+  if (!placeId) return null;
+
+  // places.googleapis.com/v1/places/【ここにPlaceIDが入る】 という形式のURL
+  const url = `${PLACES_API_DETAILS_URL}${placeId}`;
+  
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': process.env.Maps_API_KEY,
+        // 取得するフィールドをdisplayName(名前)とlocation(位置情報)に限定
+        'X-Goog-FieldMask': 'displayName,location', 
+      },
+    });
+
+    const place = response.data;
+    if (!place) return null;
+
+    // 取得した情報を整形して返す
+    return {
+      name: place.displayName?.text || '（店舗名取得失敗）',
+      latitude: place.location?.latitude || 0.0,
+      longitude: place.location?.longitude || 0.0,
+    };
+  } catch (error) {
+    if (error.response) {
+      console.error('Google Places Details API Error:', error.response.data);
+    } else {
+      console.error('Error fetching from Google Places Details API:', error.message);
+    }
+    return null; // エラー時はnullを返す
+  }
+};
+
+
+
 module.exports = {
   findShopsFromGoogle,
+  getShopDetailsFromGoogle
 };

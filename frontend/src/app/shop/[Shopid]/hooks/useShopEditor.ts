@@ -1,4 +1,4 @@
-// hooks/useShopEditor.ts
+// shop/[Shopid]/hooks/useShopEditor.ts
 import { useState } from 'react';
 import { Shop, CallRule } from '../types';
 import { DragEndEvent } from '@dnd-kit/core';
@@ -156,7 +156,7 @@ export const useShopEditor = (shop: Shop, shopId: string) => {
 
     // fetchリクエストを修正
     const response = await fetch(`${apiBaseUrl}/api/shops/${shopId}`, {
-      method: 'PUT',
+      method: 'PUT',//置き換えによってページ更新
       headers: {
         'Content-Type': 'application/json',
       },
