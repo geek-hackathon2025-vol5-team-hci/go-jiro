@@ -126,6 +126,11 @@ export default function ShopPageComponent({
             地図に戻る
           </button>
         </Link>
+        <Link href = {`/shop/${shop.id}/evaluation`}>
+          <button className = "font-sans bg-white text-black text-2xl px-12 py-4 rounded-lg shadow-md hover:bg-gray-300">
+            来店する
+          </button>
+        </Link>
       </div>
     </>
   );
