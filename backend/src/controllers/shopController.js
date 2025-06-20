@@ -34,7 +34,7 @@ const defaultShopTemplate = {
     { category: "ニンニク", option: "普通", callText: "ニンニク" ,optionOrder: 3},
     { category: "ニンニク", option: "多め", callText: "ニンニクマシ" ,optionOrder: 4},
     { category: "ニンニク", option: "非常に多め", callText: "ニンニクマシマシ" ,optionOrder: 5},
-  ],
+  ]
 };
 
 
@@ -147,7 +147,7 @@ try {
     const { shopId } = req.params;
     const { callticketOrder, callOrder, callRules, name, address, latitude, longitude } = req.body;
 
-// 2. バリデーション
+// 2. バリデーション（緩和版）
     if (!shopId || !Array.isArray(callRules)) {
       return res.status(400).json({ message: 'リクエストデータが不足しています。' });
     }
@@ -168,9 +168,12 @@ try {
       };
 
       const upsertShop = await tx.shop.upsert({
-        where: { id: shopId }, // 条件
-        update: { callticketOrder, callOrder }, // 見つかった時、この二つの項目を更新
-        create: shopData, // ないとき、新規作成
+        where: { id: shopId },
+        update: {
+          callticketOrder: callticketOrder || 'リョウ,カタサ',
+          callOrder: callOrder || 'ヤサイ,アブラ,ニンニク',
+        },
+        create: shopData,
       });
 
       // 3-2. 既存のCallRuleをすべて削除
