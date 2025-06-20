@@ -11,6 +11,7 @@ import {
   AdvancedMarker,
   InfoWindow,
   useMap,
+  Pin,
 } from "@vis.gl/react-google-maps";
 
 //店舗の型
@@ -52,14 +53,14 @@ const ShopCard = ({ shop }: { shop: Shop }) => {
   );
 }
 
-//ハンバーガーボタンのアイコン
+// (★★★) ハンバーガーボタンのアイコンコンポーネントを新規作成
 const HamburgerIcon = () => (
     <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
     </svg>
 );
 
-//とじるボタンのアイコンコンポーネント
+// (★★★) 閉じるボタンのアイコンコンポーネントを新規作成
 const CloseIcon = () => (
     <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -72,7 +73,7 @@ const ShopList = ({ shops, selectedShop, onShopSelect, onClose }: { shops: Shop[
   return (
     <div className="w-80 h-full bg-white p-4 shadow-lg border-r">
       <div className = "flex justify-between items-center mb-4">
-        <h2 className="text-2xl text-black font-bold">店舗リスト</h2>
+        <h2 className="text-black text-2xl font-bold">店舗リスト</h2>
         <button onClick={onClose} className="">
             <CloseIcon />
         </button>
@@ -81,12 +82,12 @@ const ShopList = ({ shops, selectedShop, onShopSelect, onClose }: { shops: Shop[
         {shops.map((shop) => (
           <li
             key={shop.id}
-            className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
+            className={`text-black p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
               selectedShop?.id === shop.id ? 'bg-blue-100 border-blue-500' : 'hover:bg-gray-100'
             }`}
             onClick={() => onShopSelect(shop)}
           >
-            <p className="font-bold text-black text-lg">{shop.name}</p>
+            <p className="font-bold text-lg">{shop.name}</p>
             <p className="text-sm text-gray-600 mt-1">{shop.address}</p>
           </li>
         ))}
@@ -97,8 +98,19 @@ const ShopList = ({ shops, selectedShop, onShopSelect, onClose }: { shops: Shop[
 
 
 //Mapをインスタンス化し、マーカーの挙動をきめる
-const MapController = ({ shops, onMarkerClick, selectedShop, onMapLoad }: { shops: Shop[], onMarkerClick: (shop: Shop | null) 
-                      => void, selectedShop: Shop | null, onMapLoad: (map: google.maps.Map) => void }) => {
+const MapController = ({
+  shops,
+  onMarkerClick,
+  selectedShop,
+  onMapLoad,
+  position, // position prop を追加
+}: {
+  shops: Shop[];
+  onMarkerClick: (shop: Shop | null) => void;
+  selectedShop: Shop | null;
+  onMapLoad: (map: google.maps.Map) => void;
+  position: { lat: number; lng: number } | null; // position の型を追加
+}) => {
   
   //<Map>の中だから実行できる
   const map = useMap(); //下のuseEffectが動作
@@ -135,6 +147,16 @@ const MapController = ({ shops, onMarkerClick, selectedShop, onMapLoad }: { shop
           {/*カードを表示*/}
           <ShopCard shop={selectedShop} />
         </InfoWindow>
+      )}
+      {/* 現在位置に青いピンを立てる */}
+      {position && (
+        <AdvancedMarker position={position} title={"現在位置"}>
+          <Pin
+            background={"#007bff"} // ピンの背景色を青に
+            borderColor={"#ffffff"} // 枠線の色を白に
+            glyphColor={"#ffffff"} // 中のアイコンの色を白に
+          />
+        </AdvancedMarker>
       )}
     </>
   );
@@ -266,6 +288,7 @@ export default function MapPage() {
               selectedShop={selectedShop} //選択中の店舗ステート
               onMarkerClick={setSelectedShop} //マーカークリック時のリスナーに選択中の店舗ステートを登録
               onMapLoad={setMapInstance} //地図ロード時のリスナーにMapインスタンスステートを登録
+              position={position} // ← 追加
             />
           </Map>
         </main>
