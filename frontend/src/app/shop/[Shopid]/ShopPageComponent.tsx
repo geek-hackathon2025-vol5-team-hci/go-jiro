@@ -1,11 +1,12 @@
-// ShopPageComponent.tsx
+// /shop/[Shopid]/ShopPageComponent.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Shop } from "./types";
 import { useShopEditor } from "./hooks/useShopEditor";
 import { CategoryList } from "./components/CategoryList";
-import Link from "next/link";
+
 
 interface ShopPageComponentProps {
   shop: Shop;
@@ -64,6 +65,7 @@ export default function ShopPageComponent({
   }, [selections, editor]);
 
   return (
+    <>
     <div className="max-w-2xl mx-auto p-6 bg-yellow-100 rounded-2xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-yellow-900">
@@ -71,7 +73,7 @@ export default function ShopPageComponent({
         </h1>
         <button
           onClick={() => editor.setIsEditMode(!editor.isEditMode)}
-          className="text-sm bg-yellow-400 text-white py-1 px-3 rounded w-28 text-center"
+          className="text-sm bg-yellow-400 text-white py-1 px-3 rounded w-28 text-center hover:bg-yellow-500"
         >
           {editor.isEditMode ? "閲覧モードに戻る" : "編集"}
         </button>
@@ -106,28 +108,25 @@ export default function ShopPageComponent({
       ) : (
         <>
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-2 text-yellow-800">
-              現在の券売機コール文言
-            </h2>
-            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200">
-              {ticketText || "コールの必要なし"}
-            </p>
+            <h2 className="text-xl font-semibold mb-2 text-yellow-800">現在の券売機コール文言</h2>
+            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200 text-black">{ticketText || "コールの必要なし"}</p>
           </div>
           <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-2 text-yellow-800">
-              現在の無料トッピングコール文言
-            </h2>
-            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200">
-              {toppingText || "そのまま"}
-            </p>
+            <h2 className="text-xl font-semibold mb-2 text-yellow-800">現在の無料トッピングコール文言</h2>
+            <p className="p-3 bg-white rounded-md shadow-inner border border-yellow-200 text-black">{toppingText || "そのまま"}</p>
           </div>
         </>
       )}
-      <Link href={`/shop/${shop.id}/evaluation`}>
-        <button className="bg-blue-500 text-white p-2 rounded-md">
-          このお店を評価する
-        </button>
-      </Link>
-    </div>
+
+      </div>
+
+      <div className = "mt-8 border-t pt-6 pb-6 text-center">
+        <Link href = "/map">
+          <button className = "font-sans bg-white text-black text-2xl px-12 py-4 rounded-lg shadow-md hover:bg-gray-300">
+            地図に戻る
+          </button>
+        </Link>
+      </div>
+    </>
   );
 }

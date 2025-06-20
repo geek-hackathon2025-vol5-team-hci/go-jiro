@@ -101,9 +101,40 @@ export const CategoryItem = ({
           </button>
           {activeAddFormCategory === category && (
             <div className="my-2 flex flex-col gap-2 p-2 bg-blue-50 rounded-md">
-              <input /* ... */ />
-              <input /* ... */ />
-              <button /* ... */>オプション追加</button>
+              <input
+                className="border px-2 py-1 text-sm text-zinc-500"
+                placeholder="新しいオプション名"
+                value={newOptions[category]?.option || ""}
+                onChange={(e) =>
+                  setNewOptions((prev) => ({
+                    ...prev,
+                    [category]: { ...prev[category], option: e.target.value },
+                  }))
+                }
+              />
+              <input
+                className="border px-2 py-1 text-sm text-zinc-500"
+                placeholder="コール文言（任意）"
+                value={newOptions[category]?.callText || ""}
+                onChange={(e) =>
+                  setNewOptions((prev) => ({
+                    ...prev,
+                    [category]: {
+                      ...prev[category],
+                      callText: e.target.value,
+                    },
+                  }))
+                }
+              />
+              <button
+                className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
+                onClick={() => {
+                  handleAddOptionInline(category);
+                  setActiveAddFormCategory(null); // 追加後フォームを閉じる
+                }}
+              >
+                オプション追加
+              </button>
             </div>
           )}
         </>
@@ -118,23 +149,37 @@ export const CategoryItem = ({
                 {isEditMode ? (
                   <SortableOptionItem id={id} disabled={!isEditMode}>
                     {activeEditId === id ? (
-                      <div ref={editorRef} className="flex items-center gap-2">
-                        {/* option, callText, category の編集UI */}
-                        <input value={option} onChange={(e) => onOptionChange(id, e.target.value)} /* ... */ />
-                        <input value={callText} onChange={(e) => onCallTextChange(id, e.target.value)} /* ... */ />
-                        <select value={category} onChange={(e) => onCategoryChange(id, e.target.value)} /* ... */>
-                          {/* ... */}
-                        </select>
-                        <button onClick={() => handleDeleteOption(id)}>🗑</button>
+                      <div ref={editorRef} className="flex items-center gap-2 text-black">
+                        <input
+                          className="border px-2 py-1 text-sm"
+                          value={option}
+                          onChange={(e) => onOptionChange(id, e.target.value)}
+                        />
+                        <input
+                          className="border px-2 py-1 text-sm"
+                          value={callText}
+                          onChange={(e) => onCallTextChange(id, e.target.value)}
+                        />
+                        <button
+                          onClick={() => handleDeleteOption(id)}
+                          className="text-red-500"
+                        >
+                          🗑
+                        </button>
                       </div>
                     ) : (
-                      <div className="cursor-pointer" onClick={() => setActiveEditId(id)}>
+                      // 通常はオプション名のみ表示。クリックで編集フォームに切り替え
+                      <div
+                        className="cursor-pointer text-black"
+                        onClick={() => setActiveEditId(id)}
+                      >
                         <span>{option}</span>
                       </div>
                     )}
                   </SortableOptionItem>
                 ) : (
-                  <label className="flex items-center gap-2 cursor-pointer p-2">
+                  // 【閲覧モード】選択可能なラジオボタンとして表示
+                  <label className="flex items-center gap-2 cursor-pointer p- text-black">
                     <input
                       type="radio"
                       name={category}

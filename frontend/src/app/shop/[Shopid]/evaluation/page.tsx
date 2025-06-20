@@ -7,7 +7,7 @@ async function getShopData(shopId: string): Promise<Shop | null> {
   // page.tsxのmockShopsを参考にしています
   const mockShops: Shop[] = [
     {
-      id: 1,
+      id: '1',
       name: "ラーメン二郎 新宿店",
       callticketOrder: "リョウ,カタサ",
       callOrder: "ヤサイ,アブラ,ニンニク",

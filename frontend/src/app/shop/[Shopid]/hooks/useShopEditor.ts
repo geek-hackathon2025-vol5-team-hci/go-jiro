@@ -1,4 +1,4 @@
-// hooks/useShopEditor.ts
+// shop/[Shopid]/hooks/useShopEditor.ts
 import { useState } from 'react';
 import { Shop, CallRule } from '../types';
 import { DragEndEvent } from '@dnd-kit/core';
@@ -57,7 +57,7 @@ export const useShopEditor = (shop: Shop, shopId: string) => {
     const { option, callText } = newOptions[category] || { option: "", callText: "" };
     if (!option) return;
     const newId = Math.max(0, ...editableRules.map((r) => r.id)) + 1;
-    const newRule: CallRule = { id: newId, shopId: Number(shopId), category, option, callText };
+    const newRule: CallRule = { id: newId, shopId: String(shopId), category, option, callText };
     setEditableRules((prev) => [...prev, newRule]);
     setNewOptions((prev) => ({ ...prev, [category]: { option: "", callText: "" }}));
   };
@@ -76,7 +76,7 @@ export const useShopEditor = (shop: Shop, shopId: string) => {
     else setEditableToppingCategories((prev) => [...prev, newCategoryName]);
     const newId = Math.max(0, ...editableRules.map((r) => r.id)) + 1;
     const newRule: CallRule = {
-      id: newId, shopId: Number(shopId), category: newCategoryName,
+      id: newId, shopId: String(shopId), category: newCategoryName,
       option: newFirstOption, callText: newFirstOption, optionOrder: 0
     };
     setEditableRules((prev) => [...prev, newRule]);
@@ -99,35 +99,95 @@ export const useShopEditor = (shop: Shop, shopId: string) => {
       alert('カテゴリー名を入力してください。');
       return;
     }
-    const allCategories = [...editableTicketCategories, ...editableToppingCategories];
-    if (allCategories.includes(trimmedNewCategory) && oldCategory !== trimmedNewCategory) {
-      alert('そのカテゴリー名は既に使用されています。');
-      return;
+  }
+  /**
+   * 編集内容をDBに保存する
+   */
+  const handleSave = async () => {
+    setIsSaving(true); // 保存処理開始
+    
+    // Step 1: 送信データの準備
+    const updatedRules = [...editableRules];
+    // カテゴリごとにルールをグループ化
+    const rulesByCategory = updatedRules.reduce((acc, rule) => {
+      (acc[rule.category] = acc[rule.category] || []).push(rule);
+      return acc;
+    }, {} as Record<string, CallRule[]>);
+
+    // 各カテゴリ内でoptionOrderを0から再採番する
+    Object.values(rulesByCategory).forEach(rules => {
+      rules.forEach((rule, index) => {
+        rule.optionOrder = index;
+      });
+    });
+
+    // カテゴリの並び順をカンマ区切りの文字列に戻す
+    const ticketOrderString = editableTicketCategories.join(',');
+    const toppingOrderString = editableToppingCategories.join(',');
+
+    // Step 2: APIへ送信するデータ（ペイロード）を作成
+    const payload = {
+      callticketOrder: ticketOrderString,
+      callOrder: toppingOrderString,
+      callRules: updatedRules,
+    };
+
+    // Step 3: APIを呼び出し、DBに保存
+    try {
+    // 環境変数からAPIのベースURLを読み込む
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    // fetchリクエストを修正
+    const response = await fetch(`${apiBaseUrl}/api/shops/${shopId}`, {
+      method: 'PUT',//置き換えによってページ更新
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include', // Cookieをリクエストに含める
+    });
+
+      if (!response.ok) throw new Error('データベースの保存に失敗しました。');
+
+      // Step 4: 保存成功時の処理
+      // ローカルの "保存済み" Stateを更新
+      setSavedRules(updatedRules);
+      setSavedTicketCategories(editableTicketCategories);
+      setSavedToppingCategories(editableToppingCategories);
+      
+      // 編集モードを終了
+      setIsEditMode(false);
+      setActiveEditId(null);
+      alert('保存しました！');
+
+    } catch (error) {
+      console.error(error);
+      alert('エラーが発生しました。変更は保存されていません。');
+    } finally {
+      setIsSaving(false); // 保存処理終了
     }
-    setEditableRules((prevRules) =>
-      prevRules.map((rule) =>
-        rule.category === oldCategory ? { ...rule, category: trimmedNewCategory } : rule
-      )
-    );
-    setEditableTicketCategories((prev) =>
-      prev.map((cat) => (cat === oldCategory ? trimmedNewCategory : cat))
-    );
-    setEditableToppingCategories((prev) =>
-      prev.map((cat) => (cat === oldCategory ? trimmedNewCategory : cat))
-    );
   };
 
-  const handleSave = async () => { /* 保存処理 (省略) */ };
-
+  /**
+   * 編集をキャンセルし、保存前の状態に戻す
+   */
   const handleCancel = () => {
+    // 全ての編集中Stateを保存済みStateに戻す
     setEditableRules(savedRules);
     setEditableTicketCategories(savedTicketCategories);
     setEditableToppingCategories(savedToppingCategories);
+    
+    // UIの状態をリセット
     setIsEditMode(false);
     setActiveEditId(null);
     setAddCategoryFor(null);
   };
 
+  /**
+   * オプションのドラッグ＆ドロップ終了時の処理
+   * @param event - D&Dイベントオブジェクト
+   * @param category - 対象のカテゴリー名
+   */
   const handleOptionDragEnd = (event: DragEndEvent, category: string) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
@@ -136,21 +196,32 @@ export const useShopEditor = (shop: Shop, shopId: string) => {
         const otherOptions = rules.filter((r) => r.category !== category);
         const oldIndex = categoryOptions.findIndex((r) => r.id === active.id);
         const newIndex = categoryOptions.findIndex((r) => r.id === over.id);
+        // 配列の並び順を変更
         const reorderedCategoryOptions = arrayMove(categoryOptions, oldIndex, newIndex);
+        // 他のカテゴリーのオプションと結合して新しいルールリストを作成
         return [...otherOptions, ...reorderedCategoryOptions];
       });
     }
   };
 
+  /**
+   * カテゴリーのドラッグ＆ドロップ終了時の処理
+   * @param event - D&Dイベントオブジェクト
+   * @param type - 対象のセクション ('ticket' | 'topping')
+   */
   const handleCategoryDragEnd = (event: DragEndEvent, type: "ticket" | "topping") => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const reorderFn = (items: string[]) => arrayMove(items, items.indexOf(active.id as string), items.indexOf(over.id as string));
-      if (type === "ticket") setEditableTicketCategories(reorderFn);
-      else setEditableToppingCategories(reorderFn);
+      if (type === "ticket") {
+        setEditableTicketCategories(reorderFn);
+      } else {
+        setEditableToppingCategories(reorderFn);
+      }
     }
   };
 
+  
   return {
     isEditMode, editableRules, editableTicketCategories, editableToppingCategories,
     savedRules, savedTicketCategories, savedToppingCategories,

@@ -21,11 +21,12 @@ model AccessLog {
 
 // お店の情報を格納するモデル
 model Shop {
-  id        Int      @id @default(autoincrement())
+  id        String  @id 
   name      String
   address   String?
   latitude  Float    // 緯度
   longitude Float    // 経度
+  callticketOrder String?
   callOrder   String?
   callRules   CallRule[] 
   createdAt DateTime @default(now())
@@ -35,10 +36,11 @@ model Shop {
 
 model CallRule {
   id        Int      @id @default(autoincrement())
-  shopId    Int      // どの店舗のルールかを示すID
+  shopId    String      // どの店舗のルールかを示すID
   category  String   // カテゴリ (例: "ヤサイ", "ニンニク")
   option    String   // 選択肢 (例: "少なめ", "多め（マシ）")
   callText  String   // 出力されるコール文言 (例: "ヤサイスクナメ")
+  optionOrder Int?
   
   // Shopモデルとのリレーションを定義
   shop      Shop     @relation(fields: [shopId], references: [id])
