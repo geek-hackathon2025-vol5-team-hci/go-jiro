@@ -94,6 +94,9 @@ const getShopDetailsFromGoogle = async (placeId) => {
   
   try {
     const response = await axios.get(url, {
+      params: {
+        languageCode: 'ja',
+      },
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': process.env.Maps_API_KEY,
