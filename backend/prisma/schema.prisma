@@ -26,8 +26,8 @@ model Shop {
   address   String?
   latitude  Float    // 緯度
   longitude Float    // 経度
-  callticketOrder String?
-  callOrder   String?
+  callticketOrder String  @default("")
+  callOrder   String  @default("")
   callRules   CallRule[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
