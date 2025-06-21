@@ -1,13 +1,13 @@
 // backend/src/config/passport.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const prisma = require('./prisma');
 
+// PassportでのGoogleStrategyの設定
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/api/auth/google/callback",
-    scope: ['profile', 'email']
+    clientID: process.env.GOOGLE_CLIENT_ID, // 
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET, // 
+    callbackURL: "http://localhost:3000/api/auth/google/callback", // 
+    scope: ['profile', 'email'] // 
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -41,19 +41,12 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-// ▼▼▼ 修正箇所 ▼▼▼
-// セッションにはユーザーのDB上のIDのみを保存する
+// セッションにユーザー情報をシリアライズ(保存)
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user); // 
 });
 
-// セッションからIDを使ってユーザー情報を復元する
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { id } });
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
+// セッションからユーザー情報をデシリアライズ(取り出す)
+passport.deserializeUser((obj, done) => {
+  done(null, obj); // 
 });
-// ▲▲▲ 修正箇所 ▲▲▲
