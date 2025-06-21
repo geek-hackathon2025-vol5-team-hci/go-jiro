@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   APIProvider,
   Map,
@@ -48,7 +48,7 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
           alt="次郎度アイコン"
           className="w-6 h-6 object-contain"
         />
-        <p className="text-black text-sm font-semibold">次郎度: {shop.jiro_score}</p>
+        <p className="text-black text-sm font-semibold">二郎度: {shop.jiro_score}</p>
       </div>
     )}
     <Link href={`/shop/${shop.id}`}>
@@ -105,7 +105,6 @@ const assignJiroScore = (shops: Shop[]): Shop[] => {
   }));
 };
 
-// 店舗リストコンポーネント
 const ShopList = ({
   shops,
   selectedShop,
@@ -117,19 +116,42 @@ const ShopList = ({
   onShopSelect: (shop: Shop | null) => void;
   onClose: () => void;
 }) => {
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+
+  // 並び替え処理（次郎度が未定義のときは0扱い）
+  const sortedShops = useMemo(() => {
+    return [...shops].sort((a, b) => {
+      const scoreA = a.jiro_score ?? 0;
+      const scoreB = b.jiro_score ?? 0;
+      return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
+    });
+  }, [shops, sortOrder]);
+
   return (
     <div className="w-80 h-full bg-white p-4 shadow-lg border-r flex flex-col">
       {/* ヘッダー */}
-      <div className="flex justify-between items-center mb-4 flex-shrink-0">
+      <div className="flex justify-between items-center mb-2 flex-shrink-0">
         <h2 className="text-2xl text-black font-bold">店舗リスト</h2>
         <button onClick={onClose} className="md:hidden">
           <CloseIcon />
         </button>
       </div>
 
+      {/* 並び替えボタン */}
+      <div className="mb-4">
+        <button
+          onClick={() =>
+            setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
+          }
+          className="px-3 py-1 text-sm text-black bg-gray-200 hover:bg-gray-300 rounded"
+        >
+          二郎度: {sortOrder === "desc" ? "高い順" : "低い順"}
+        </button>
+      </div>
+
       {/* 店舗リスト */}
       <ul className="overflow-y-auto flex-grow">
-        {shops.map((shop) => (
+        {sortedShops.map((shop) => (
           <li
             key={shop.id}
             className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
@@ -150,9 +172,15 @@ const ShopList = ({
                 <p className="font-bold text-black text-lg">{shop.name}</p>
                 <p className="text-sm text-gray-600">{shop.address}</p>
                 <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-xs text-gray-500">次郎度: {shop.jiro_score}</p>
-                  <span className="text-xs px-2 py-1 rounded-full text-white font-semibold"
-                        style={{ backgroundColor: getColorByScore(shop.jiro_score!) }}>
+                  <p className="text-xs text-gray-500">
+                    二郎度: {shop.jiro_score}
+                  </p>
+                  <span
+                    className="text-xs px-2 py-1 rounded-full text-white font-semibold"
+                    style={{
+                      backgroundColor: getColorByScore(shop.jiro_score!),
+                    }}
+                  >
                     {getLevelByScore(shop.jiro_score!)}
                   </span>
                 </div>
@@ -164,6 +192,7 @@ const ShopList = ({
     </div>
   );
 };
+
 
 // マップにマーカーを表示
 const MapController = ({
