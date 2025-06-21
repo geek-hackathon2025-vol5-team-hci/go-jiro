@@ -1,33 +1,50 @@
-// backend/src/controllers/evaluationController.js
 const prisma = require('../config/prisma');
 
-exports.createEvaluation = async (req, res, next) => {
+exports.createEvaluation = async (req, res) => {
+  const { shopId, estimatePortion, actualPortion, orderHelp, exitPressure, comment } = req.body;
+  const userId = req.user.id;
+
   try {
-    // ログインユーザーのIDは req.user.id から取得（passportの修正により可能になる）
-    const userId = req.user.id;
-    // フロントエンドから送られてくるデータ
-    const { shopId, comment, rating_taste, rating_volume, rating_hurdle } = req.body;
+    // フロントエンドから直接数値が送られてくるため、そのまま計算に使用
+    const jirodo = (-estimatePortion + actualPortion + 2 * orderHelp + 2 * exitPressure) / 24;
 
-    // バリデーション
-    if (!shopId || !userId || !rating_taste || !rating_volume || !rating_hurdle) {
-      return res.status(400).json({ message: '必須項目が不足しています。' });
-    }
-
-    // データベースに評価を作成
     const newEvaluation = await prisma.evaluation.create({
       data: {
-        shopId,
-        userId,
+        jirodo,
+        estimatePortion,
+        actualPortion,
+        orderHelp,
+        exitPressure,
         comment,
-        rating_taste,
-        rating_volume,
-        rating_hurdle,
+        shop: { connect: { id: shopId } },
+        user: { connect: { id: userId } },
       },
     });
-
     res.status(201).json(newEvaluation);
   } catch (error) {
-    console.error('評価の作成中にエラーが発生しました:', error);
-    next(error);
+    res.status(400).json({ message: 'Error creating evaluation', error: error.message });
   }
+};
+
+exports.getEvaluationsByShopId = async (req, res) => {
+    const { shopId } = req.params;
+    try {
+        const evaluations = await prisma.evaluation.findMany({
+            where: { shopId: parseInt(shopId) },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        res.status(200).json(evaluations);
+    } catch (error) {
+        res.status(400).json({ message: 'Error fetching evaluations', error: error.message });
+    }
 };
