@@ -22,7 +22,7 @@ const sessionStore = new (connectPgSimple(session))({
 
 const app = express();
 
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1); //消してもいい？
 
 
 app.use(cors({
