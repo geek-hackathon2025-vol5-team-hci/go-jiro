@@ -19,7 +19,7 @@ async function getShopData(shopId: string): Promise<Shop | null> {
 
 // ページ本体（サーバーコンポーネント）
 export default async function EvaluationPage({
-  params,
+params,
 }: {
   params: Promise<{ shopid: string }>;
 }) {
