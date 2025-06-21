@@ -103,6 +103,63 @@ const ShopList = ({
 );
 
 
+// // マップにマーカーを表示
+// const MapController = ({
+//   shops,
+//   onMarkerClick,
+//   selectedShop,
+//   onMapLoad,
+//   position,
+// }: {
+//   shops: Shop[];
+//   onMarkerClick: (shop: Shop | null) => void;
+//   selectedShop: Shop | null;
+//   onMapLoad: (map: google.maps.Map) => void;
+//   position: { lat: number; lng: number } | null;
+// }) => {
+//   const map = useMap();
+
+//   useEffect(() => {
+//     if (map) {
+//       onMapLoad(map);
+//     }
+//   }, [map, onMapLoad]);
+
+//   return (
+//     <>
+//       {shops.map((shop) => (
+//         <AdvancedMarker
+//           key={shop.id}
+//           position={{ lat: shop.latitude, lng: shop.longitude }}
+//           title={shop.name}
+//           onClick={() => onMarkerClick(shop)}
+//         />
+//       ))}
+//       {selectedShop && (
+//         <InfoWindow
+//           position={{
+//             lat: selectedShop.latitude,
+//             lng: selectedShop.longitude,
+//           }}
+//           onCloseClick={() => onMarkerClick(null)}
+//         >
+//           <ShopCard shop={selectedShop} />
+//         </InfoWindow>
+//       )}
+//       {/* 現在位置に青いピンを立てる */}
+//       {position && (
+//         <AdvancedMarker position={position} title={"現在位置"}>
+//           <Pin
+//             background={"#007bff"} // ピンの背景色を青に
+//             borderColor={"#ffffff"} // 枠線の色を白に
+//             glyphColor={"#ffffff"} // 中のアイコンの色を白に
+//           />
+//         </AdvancedMarker>
+//       )}
+//     </>
+//   );
+// };
+
 // マップにマーカーを表示
 const MapController = ({
   shops,
@@ -125,16 +182,40 @@ const MapController = ({
     }
   }, [map, onMapLoad]);
 
+  // スコアに応じたピンの色を返す関数
+  const getColorByScore = (score: number) => {
+    if (score <= 25) return "#ec4899"; // ピンク
+    if (score <= 50) return "#a3e635"; // 黄緑
+    if (score <= 75) return "#15803d"; // 深緑
+    return "#7e22ce"; // 紫
+  };
+
   return (
     <>
-      {shops.map((shop) => (
-        <AdvancedMarker
-          key={shop.id}
-          position={{ lat: shop.latitude, lng: shop.longitude }}
-          title={shop.name}
-          onClick={() => onMarkerClick(shop)}
-        />
-      ))}
+      {shops.map((shop) => {
+        // 0〜100 のランダムスコアを仮で割り振る
+        const score = Math.floor(Math.random() * 101);
+
+        // スコアに応じた色
+        const color = getColorByScore(score);
+
+        return (
+          <AdvancedMarker
+            key={shop.id}
+            position={{ lat: shop.latitude, lng: shop.longitude }}
+            title={`${shop.name} (${score}点)`}
+            onClick={() => onMarkerClick(shop)}
+          >
+            <Pin
+              background={color}
+              borderColor={"#ffffff"}
+              glyphColor={"#ffffff"}
+              glyph={score.toString()}
+            />
+          </AdvancedMarker>
+        );
+      })}
+
       {selectedShop && (
         <InfoWindow
           position={{
@@ -146,19 +227,22 @@ const MapController = ({
           <ShopCard shop={selectedShop} />
         </InfoWindow>
       )}
+
       {/* 現在位置に青いピンを立てる */}
       {position && (
         <AdvancedMarker position={position} title={"現在位置"}>
           <Pin
-            background={"#007bff"} // ピンの背景色を青に
-            borderColor={"#ffffff"} // 枠線の色を白に
-            glyphColor={"#ffffff"} // 中のアイコンの色を白に
+            background={"#007bff"}
+            borderColor={"#ffffff"}
+            glyphColor={"#ffffff"}
           />
         </AdvancedMarker>
       )}
     </>
   );
 };
+
+
 
 export default function MapPage() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
