@@ -164,7 +164,7 @@ export default function ProfilePage() {
 
             <div>
               <label htmlFor="jiroCount" className="block text-sm font-bold text-gray-700">二郎を食べた回数</label>
-              <input type="number" name="jiroCount" id="jiroCount" value={user.jiroCount || ''} onChange={handleInputChange} min="0" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
+              <input type="number" name="jiroCount" id="jiroCount" value={user.jiroCount ?? ''} onChange={handleInputChange} min="0" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
             </div>
 
             <div>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
 
             <div>
               <label htmlFor="age" className="block text-sm font-bold text-gray-700">年齢</label>
-              <input type="number" name="age" id="age" value={user.age || ''} onChange={handleInputChange} min="0" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
+              <input type="number" name="age" id="age" value={user.age ?? ''} onChange={handleInputChange} min="0" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
             </div>
 
             <div>
