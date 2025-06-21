@@ -143,7 +143,7 @@ const ShopList = ({
           onClick={() =>
             setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
           }
-          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+          className="px-3 py-1 text-sm text-black bg-gray-200 hover:bg-gray-300 rounded"
         >
           二郎度: {sortOrder === "desc" ? "高い順" : "低い順"}
         </button>
