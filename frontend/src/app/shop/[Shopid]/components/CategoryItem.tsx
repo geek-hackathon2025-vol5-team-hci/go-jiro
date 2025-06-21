@@ -4,6 +4,8 @@ import { CallRule } from '../types';
 import { SortableOptionItem } from './SortableItems';
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, closestCenter } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+//削除アイコン(DeleteIcon)をimport
+import { DeleteIcon } from "../../../../components/DeleteIcon";
 
 interface CategoryItemProps {
   category: string;
@@ -82,16 +84,10 @@ export const CategoryItem = ({
         ) : (
           <strong className="block text-lg font-semibold mb-2 text-yellow-800">{category}</strong>
         )}
-        
+        {/* DeleteIconを押すと削除できるように */}
         {isEditMode && (
-          <button
-            onClick={() => handleDeleteCategory(category)}
-            className="text-red-500 hover:text-red-700 p-1 mb-2"
-            title={`${category} カテゴリーを削除`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+          <button onClick={() => handleDeleteCategory(category)}>
+            <DeleteIcon />
           </button>
         )}
       </div>
@@ -143,7 +139,10 @@ export const CategoryItem = ({
                       <div ref={editorRef} className="flex items-center gap-2 text-black">
                         <input className="border px-2 py-1 text-sm" value={option} onChange={(e) => onOptionChange(id, e.target.value)} />
                         <input className="border px-2 py-1 text-sm" value={callText} onChange={(e) => onCallTextChange(id, e.target.value)} />
-                        <button onClick={() => handleDeleteOption(id)} className="text-red-500">🗑</button>
+                        {/* DeleteIconを押すと消えるように */}
+                        <button onClick={() => handleDeleteOption(id)}>
+                          <DeleteIcon />
+                        </button>
                       </div>
                     ) : (
                       <div className="cursor-pointer text-black" onClick={() => setActiveEditId(id)}>
