@@ -10,9 +10,16 @@ require('./config/passport'); // Passport 設定
 const app = express();
 
 // CORSは先に設定し、cookieを有効にする
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // フロントエンドのローカル環境のURLを許可
-  credentials: true,
+app.use(session({
+  store: sessionStore,
+  secret: process.env.SESSION_SECRET || 'fallback-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30日間有効
+    secure: process.env.NODE_ENV === 'production', // 本番環境ではhttps通信のみ
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  } 
 }));
 
 // JSON パースミドルウェア
