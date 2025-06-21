@@ -7,6 +7,8 @@ import { CategoryItem } from './CategoryItem';
 import { AddCategoryForm } from './AddCategoryForm';
 import { useShopEditor } from '../hooks/useShopEditor';
 
+
+
 /**
  * CategoryListコンポーネントが受け取るPropsの型定義
  * @param title - セクションのタイトル (例: "券売機コール")

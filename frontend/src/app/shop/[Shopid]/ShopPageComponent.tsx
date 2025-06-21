@@ -130,13 +130,6 @@ export default function ShopPageComponent({
             地図に戻る
           </button>
         </Link>
-        {/* ▼▼▼ このLinkのhrefを修正 ▼▼▼ */}
-        <Link href={`/evaluation/${shop.id}`}>
-        {/* ▲▲▲ 修正後: /evaluation/[shopid] 形式にする ▲▲▲ */}
-          <button className="font-sans bg-yellow-400 text-black text-lg px-8 py-3 rounded-lg shadow-md hover:bg-yellow-500">
-            このお店を評価する
-          </button>
-        </Link>
       </div>
     </>
   );
