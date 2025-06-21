@@ -7,6 +7,19 @@ const session = require('express-session');
 const apiRouter = require('./api');
 require('./config/passport'); // Passport 設定
 
+const pg = require('pg');
+const connectPgSimple = require('connect-pg-simple');
+
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+const sessionStore = new (connectPgSimple(session))({
+  pool: pgPool,
+  createTableIfMissing: true,
+});
+
 const app = express();
 
 // CORSは先に設定し、cookieを有効にする
