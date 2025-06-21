@@ -15,8 +15,8 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
 
   const [estimatePortion, setEstimatePortion] = useState(0);
   const [actualPortion, setActualPortion] = useState(0);
-  const [orderHelp, setOrderHelp] = useState("");
-  const [exitPressure, setExitPressure] = useState("");
+  const [orderHelp, setOrderHelp] = useState(0);
+  const [exitPressure, setExitPressure] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +42,7 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
 
     try {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const response = await fetch(`${apiBaseUrl}/api/jirodo`, {
+      const response = await fetch(`${apiBaseUrl}/api/evaluations`, { // Note: endpoint might be /api/evaluations
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -99,25 +99,25 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
 
         <div>
           <label className="font-bold text-lg text-red-800">Q3. 注文しやすかったか</label>
-          <select value={orderHelp} onChange={(e) => setOrderHelp(e.target.value)} className="w-full mt-2 p-2 border rounded">
-            <option value="">選択してください</option>
-            <option value="S">S: なんの説明もなく独自のルールがあった</option>
-            <option value="A">A: 説明が不十分で不安があった</option>
-            <option value="B">B: 一般的なコールがあり、その説明がされていた</option>
-            <option value="C">C: 店内掲示に具体的なコール内容が記載されていた</option>
-            <option value="D">D: コールそのものが不要だった</option>
+          <select value={orderHelp} onChange={(e) => setOrderHelp(Number(e.target.value))} className="w-full mt-2 p-2 border rounded">
+            <option value={0}>選択してください</option>
+            <option value={1}>S: なんの説明もなく独自のルールがあった</option>
+            <option value={2}>A: 説明が不十分で不安があった</option>
+            <option value={3}>B: 一般的なコールがあり、その説明がされていた</option>
+            <option value={4}>C: 店内掲示に具体的なコール内容が記載されていた</option>
+            <option value={5}>D: コールそのものが不要だった</option>
           </select>
         </div>
 
         <div>
           <label className="font-bold text-lg text-red-800">Q4. 退店圧</label>
-          <select value={exitPressure} onChange={(e) => setExitPressure(e.target.value)} className="w-full mt-2 p-2 border rounded">
-            <option value="">選択してください</option>
-            <option value="S">S: 店主の気配で早食いになる、初心者が怯える</option>
-            <option value="A">A: 回転圧を明確に感じるがギリ礼儀的</option>
-            <option value="B">B: 早めに出なきゃな、程度の空気感</option>
-            <option value="C">C: 特に何も言われず、落ち着いて食える</option>
-            <option value="D">D: 長居しても何も言われない（異例）</option>
+          <select value={exitPressure} onChange={(e) => setExitPressure(Number(e.target.value))} className="w-full mt-2 p-2 border rounded">
+            <option value={0}>選択してください</option>
+            <option value={1}>S: 店主の気配で早食いになる、初心者が怯える</option>
+            <option value={2}>A: 回転圧を明確に感じるがギリ礼儀的</option>
+            <option value={3}>B: 早めに出なきゃな、程度の空気感</option>
+            <option value={4}>C: 特に何も言われず、落ち着いて食える</option>
+            <option value={5}>D: 長居しても何も言われない（異例）</option>
           </select>
         </div>
 
