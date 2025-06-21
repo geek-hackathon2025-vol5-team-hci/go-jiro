@@ -9,6 +9,7 @@ import {
   AdvancedMarker,
   InfoWindow,
   useMap,
+  Pin,
 } from "@vis.gl/react-google-maps";
 
 // 店舗の型
@@ -104,11 +105,13 @@ const MapController = ({
   onMarkerClick,
   selectedShop,
   onMapLoad,
+  position,
 }: {
   shops: Shop[];
   onMarkerClick: (shop: Shop | null) => void;
   selectedShop: Shop | null;
   onMapLoad: (map: google.maps.Map) => void;
+  position: { lat: number; lng: number } | null;
 }) => {
   const map = useMap();
 
@@ -138,6 +141,16 @@ const MapController = ({
         >
           <ShopCard shop={selectedShop} />
         </InfoWindow>
+      )}
+      {/* 現在位置に青いピンを立てる */}
+      {position && (
+        <AdvancedMarker position={position} title={"現在位置"}>
+          <Pin
+            background={"#007bff"} // ピンの背景色を青に
+            borderColor={"#ffffff"} // 枠線の色を白に
+            glyphColor={"#ffffff"} // 中のアイコンの色を白に
+          />
+        </AdvancedMarker>
       )}
     </>
   );
@@ -272,10 +285,11 @@ export default function MapPage() {
             mapId="go-jiro-map"
           >
             <MapController
-              shops={shops}
-              selectedShop={selectedShop}
-              onMarkerClick={setSelectedShop}
-              onMapLoad={setMapInstance}
+              shops={shops} //取得した店舗ステート
+              selectedShop={selectedShop} //選択中の店舗ステート
+              onMarkerClick={setSelectedShop} //マーカークリック時のリスナーに選択中の店舗ステートを登録
+              onMapLoad={setMapInstance} //地図ロード時のリスナーにMapインスタンスステートを登録
+              position={position} // ← 追加
             />
           </Map>
         </main>

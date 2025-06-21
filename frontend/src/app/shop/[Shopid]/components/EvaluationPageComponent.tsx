@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { Shop, EVALUATION_FACTORS, Ratings } from '../types'; 
+import { Shop, EVALUATION_FACTORS } from '../types'; 
 import { useEvaluation } from '../hooks/useEvaluation';
 
 const StarRating = ({ rating, onRate }: { rating: number, onRate: (r: number) => void }) => {
