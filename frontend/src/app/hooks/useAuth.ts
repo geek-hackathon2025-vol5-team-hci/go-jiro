@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 // UserProfileの型定義
 interface UserProfile {
@@ -16,7 +16,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const useAuth = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     fetch(`${apiBaseUrl}/api/auth/profile`, { credentials: 'include' })
