@@ -1,4 +1,4 @@
-// /shop/[Shopid]/ShopPageComponent.tsx
+// /shop/[shopid]/ShopPageComponent.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
