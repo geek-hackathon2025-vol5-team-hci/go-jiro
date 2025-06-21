@@ -20,6 +20,7 @@ type Shop = {
   longitude: number;
   address?: string;
   photo?: string;
+  openingHours?: string;
 };
 
 // ポップアップウインドウの内容
@@ -36,6 +37,9 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
       />
     )}
     <p className="text-black mt-2">{shop.address}</p>
+    {shop.openingHours && (
+      <p className="text-black text-sm mt-1">今日の営業時間: {shop.openingHours}</p>
+    )}
     <Link href={`/shop/${shop.id}`}>
       <button className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
         詳細を見る
