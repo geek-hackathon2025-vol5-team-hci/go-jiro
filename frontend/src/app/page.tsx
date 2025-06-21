@@ -34,12 +34,10 @@ export default function Home() {
         if (data.user) {
           setUser(data.user);
 
-          // isNewUserフラグがあり、かつまだリダイレクトされていない場合、ブラウザ上にキーを保存しておく。
-          const hasBeenRedirected = sessionStorage.getItem('newUserRedirect');
-    if (data.user.isNewUser && !hasBeenRedirected) {
+          
+    if (data.user.isNewUser ) {
       console.log('ようこそ！初回ログインです。プロフィールページにリダイレクトします。');
-      // リダイレクトしたことをセッションストレージに記録
-      //sessionStorage.setItem('newUserRedirect', 'true');
+      
       router.push('/profile');
     }else{
       // 通常ログインの場合は地図ページへ
