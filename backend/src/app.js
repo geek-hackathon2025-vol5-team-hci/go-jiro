@@ -22,6 +22,18 @@ const sessionStore = new (connectPgSimple(session))({
 
 const app = express();
 
+app.set('trust proxy', 1); 
+
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true,
+}));
+
+// JSON パースミドルウェア
+app.use(express.json());
+
+
 // CORSは先に設定し、cookieを有効にする
 app.use(session({
   store: sessionStore,
@@ -33,16 +45,6 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production', // 本番環境ではhttps通信のみ
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   } 
-}));
-
-// JSON パースミドルウェア
-app.use(express.json());
-
-// セッションの設定（Passportの前）
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback-secret',
-  resave: false,
-  saveUninitialized: true // trueだと未認証のユーザーにもセッションが作られる
 }));
 
 // Passportの初期化
