@@ -14,7 +14,29 @@ const PLACES_API_DETAILS_URL = 'https://places.googleapis.com/v1/places/';
  * @param {number} params.lat - 中心の緯度
  * @param {number} params.lng - 中心の経度
  * @returns {Promise<Shop[]>}
+ * 
  */
+
+
+
+//今日の営業時間を抜き出す
+function extractTodayHours(regularOpeningHours) {
+  if (!regularOpeningHours || !regularOpeningHours.weekdayDescriptions) return "営業時間不明";
+
+  const days = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+  const todayIndex = new Date().getDay(); // 0 (日曜) 〜 6 (土曜)
+
+  const todayText = regularOpeningHours.weekdayDescriptions.find(desc =>
+    desc.startsWith(days[todayIndex])
+  );
+
+  return todayText ? todayText.replace(`${days[todayIndex]}: `, "") : "営業時間不明";
+}
+
+
+
+
+
 const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
   try {
     const response = await axios.post(
@@ -39,7 +61,7 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': process.env.Maps_API_KEY,
-          'X-Goog-FieldMask': 'places.id,places.displayName,places.location,places.shortFormattedAddress,places.photos',
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.location,places.shortFormattedAddress,places.photos,places.regularOpeningHours',
         },
       }
     );
@@ -57,7 +79,7 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         const photoResourceName = place.photos[0].name;
         photoUrl = `https://places.googleapis.com/v1/${photoResourceName}/media?maxHeightPx=400&key=${process.env.Maps_API_KEY}`;
       }
-
+      console.log(place.regularOpeningHours);
       return {
         id: place.id, // 店舗のID
         name: place.displayName.text, // 店舗名
@@ -65,6 +87,8 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         longitude: place.location.longitude, // 経度
         address: place.shortFormattedAddress, // 住所
         photo: photoUrl, // 写真のURL
+        openingHours: extractTodayHours(place.regularOpeningHours), 
+        //isOpen: place.regularOpeningHours, 
       };
     });
 
