@@ -27,8 +27,6 @@ passport.use(new GoogleStrategy({
             googleId: profile.id,
             email: profile.emails[0].value,
             displayName: profile.displayName,
-            // ★ 追加: photosもDBに保存する場合
-            photoUrl: profile.photos[0].value,
           },
         });
         // isNewUserフラグをtrueにしてDBのユーザー情報を渡す
