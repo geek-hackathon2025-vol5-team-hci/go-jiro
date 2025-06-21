@@ -21,6 +21,7 @@ type Shop = {
   address?: string;
   photo?: string;
   openingHours?: string;
+  jiro_score?: number; // 次郎度スコア
 };
 
 // ポップアップウインドウの内容
@@ -39,6 +40,16 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
     <p className="text-black mt-2">{shop.address}</p>
     {shop.openingHours && (
       <p className="text-black text-sm mt-1">今日の営業時間: {shop.openingHours}</p>
+    )}
+    {shop.jiro_score !== undefined && (
+      <div className="mt-2 flex items-center space-x-2">
+        <img
+          src={getImageByScore(shop.jiro_score)}
+          alt="次郎度アイコン"
+          className="w-6 h-6 object-contain"
+        />
+        <p className="text-black text-sm font-semibold">次郎度: {shop.jiro_score}</p>
+      </div>
     )}
     <Link href={`/shop/${shop.id}`}>
       <button className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
@@ -62,6 +73,38 @@ const CloseIcon = () => (
   </svg>
 );
 
+// スコアに応じた画像を返す関数
+const getImageByScore = (score: number) => {
+  if (score <= 25) return "/jiros/umeJiro.png";
+  if (score <= 50) return "/jiros/takeJiro.png";
+  if (score <= 75) return "/jiros/matsuJiro.png";
+  return "/jiros/oniJiro.png";
+};
+
+// スコアに応じたピンの色を返す関数
+const getColorByScore = (score: number) => {
+  if (score <= 25) return "#ec4899"; // ピンク（梅）
+  if (score <= 50) return "#a3e635"; // 黄緑（竹）
+  if (score <= 75) return "#15803d"; // 深緑（松）
+  return "#7e22ce"; // 紫（鬼）
+};
+
+// スコアに応じたレベル名を返す関数
+const getLevelByScore = (score: number) => {
+  if (score <= 25) return "梅";
+  if (score <= 50) return "竹";
+  if (score <= 75) return "松";
+  return "鬼";
+};
+
+// 店舗にランダムなjiro_scoreを割り当てる関数（APIから取得できない場合の代替）
+const assignJiroScore = (shops: Shop[]): Shop[] => {
+  return shops.map((shop) => ({
+    ...shop,
+    jiro_score: shop.jiro_score ?? Math.floor(Math.random() * 101), // 0～100のランダムスコア
+  }));
+};
+
 // 店舗リストコンポーネント
 const ShopList = ({
   shops,
@@ -73,92 +116,54 @@ const ShopList = ({
   selectedShop: Shop | null;
   onShopSelect: (shop: Shop | null) => void;
   onClose: () => void;
-}) => (
-  <div className="w-80 h-full bg-white p-4 shadow-lg border-r flex flex-col">
-    {/* 1. タイトルと閉じるボタンのヘッダー部分 */}
-    <div className="flex justify-between items-center mb-4 flex-shrink-0">
-      <h2 className="text-2xl text-black font-bold">店舗リスト</h2>
-      <button onClick={onClose} className="md:hidden">
-        <CloseIcon />
-      </button>
+}) => {
+  return (
+    <div className="w-80 h-full bg-white p-4 shadow-lg border-r flex flex-col">
+      {/* ヘッダー */}
+      <div className="flex justify-between items-center mb-4 flex-shrink-0">
+        <h2 className="text-2xl text-black font-bold">店舗リスト</h2>
+        <button onClick={onClose} className="md:hidden">
+          <CloseIcon />
+        </button>
+      </div>
+
+      {/* 店舗リスト */}
+      <ul className="overflow-y-auto flex-grow">
+        {shops.map((shop) => (
+          <li
+            key={shop.id}
+            className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
+              selectedShop?.id === shop.id
+                ? "bg-blue-100 border-blue-500"
+                : "hover:bg-gray-100"
+            }`}
+            onClick={() => onShopSelect(shop)}
+          >
+            <div className="flex items-center space-x-3">
+              {/* スコアに応じた画像 */}
+              <img
+                src={getImageByScore(shop.jiro_score!)}
+                alt={`${shop.name} アイコン`}
+                className="w-10 h-10 object-contain"
+              />
+              <div className="flex-grow">
+                <p className="font-bold text-black text-lg">{shop.name}</p>
+                <p className="text-sm text-gray-600">{shop.address}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p className="text-xs text-gray-500">次郎度: {shop.jiro_score}</p>
+                  <span className="text-xs px-2 py-1 rounded-full text-white font-semibold"
+                        style={{ backgroundColor: getColorByScore(shop.jiro_score!) }}>
+                    {getLevelByScore(shop.jiro_score!)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
-    {/* 2. スクロール可能なリスト部分 */}
-    <ul className="overflow-y-auto flex-grow">
-      {shops.map((shop) => (
-        <li
-          key={shop.id}
-          className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
-            selectedShop?.id === shop.id
-              ? "bg-blue-100 border-blue-500"
-              : "hover:bg-gray-100"
-          }`}
-          onClick={() => onShopSelect(shop)}
-        >
-          <p className="font-bold text-black text-lg">{shop.name}</p>
-          <p className="text-sm text-gray-600 mt-1">{shop.address}</p>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
-
-
-// // マップにマーカーを表示
-// const MapController = ({
-//   shops,
-//   onMarkerClick,
-//   selectedShop,
-//   onMapLoad,
-//   position,
-// }: {
-//   shops: Shop[];
-//   onMarkerClick: (shop: Shop | null) => void;
-//   selectedShop: Shop | null;
-//   onMapLoad: (map: google.maps.Map) => void;
-//   position: { lat: number; lng: number } | null;
-// }) => {
-//   const map = useMap();
-
-//   useEffect(() => {
-//     if (map) {
-//       onMapLoad(map);
-//     }
-//   }, [map, onMapLoad]);
-
-//   return (
-//     <>
-//       {shops.map((shop) => (
-//         <AdvancedMarker
-//           key={shop.id}
-//           position={{ lat: shop.latitude, lng: shop.longitude }}
-//           title={shop.name}
-//           onClick={() => onMarkerClick(shop)}
-//         />
-//       ))}
-//       {selectedShop && (
-//         <InfoWindow
-//           position={{
-//             lat: selectedShop.latitude,
-//             lng: selectedShop.longitude,
-//           }}
-//           onCloseClick={() => onMarkerClick(null)}
-//         >
-//           <ShopCard shop={selectedShop} />
-//         </InfoWindow>
-//       )}
-//       {/* 現在位置に青いピンを立てる */}
-//       {position && (
-//         <AdvancedMarker position={position} title={"現在位置"}>
-//           <Pin
-//             background={"#007bff"} // ピンの背景色を青に
-//             borderColor={"#ffffff"} // 枠線の色を白に
-//             glyphColor={"#ffffff"} // 中のアイコンの色を白に
-//           />
-//         </AdvancedMarker>
-//       )}
-//     </>
-//   );
-// };
+  );
+};
 
 // マップにマーカーを表示
 const MapController = ({
@@ -182,28 +187,17 @@ const MapController = ({
     }
   }, [map, onMapLoad]);
 
-  // スコアに応じたピンの色を返す関数
-  const getColorByScore = (score: number) => {
-    if (score <= 25) return "#ec4899"; // ピンク
-    if (score <= 50) return "#a3e635"; // 黄緑
-    if (score <= 75) return "#15803d"; // 深緑
-    return "#7e22ce"; // 紫
-  };
-
   return (
     <>
       {shops.map((shop) => {
-        // 0〜100 のランダムスコアを仮で割り振る
-        const score = Math.floor(Math.random() * 101);
-
-        // スコアに応じた色
+        const score = shop.jiro_score!;
         const color = getColorByScore(score);
 
         return (
           <AdvancedMarker
             key={shop.id}
             position={{ lat: shop.latitude, lng: shop.longitude }}
-            title={`${shop.name} (${score}点)`}
+            title={`${shop.name} - 次郎度: ${score} (${getLevelByScore(score)})`}
             onClick={() => onMarkerClick(shop)}
           >
             <Pin
@@ -242,8 +236,6 @@ const MapController = ({
   );
 };
 
-
-
 export default function MapPage() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
@@ -251,6 +243,9 @@ export default function MapPage() {
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // スコアが割り当てられた店舗リスト（一度だけスコアを生成）
+  const shopsWithScore = React.useMemo(() => assignJiroScore(shops), [shops]);
 
   const handleSearch = useCallback(
     async (keyword: string) => {
@@ -268,6 +263,7 @@ export default function MapPage() {
         if (!response.ok) throw new Error("Failed to fetch shops");
         const data: Shop[] = await response.json();
 
+        // 写真のプリロード
         data.forEach((shop) => {
           if (shop.photo) {
             const img = new window.Image();
@@ -340,7 +336,7 @@ export default function MapPage() {
         >
           <ShopList
             key={isMenuOpen ? "open" : "closed"}
-            shops={shops}
+            shops={shopsWithScore}
             selectedShop={selectedShop}
             onShopSelect={setSelectedShop}
             onClose={() => setIsMenuOpen(false)}
@@ -373,11 +369,11 @@ export default function MapPage() {
             mapId="go-jiro-map"
           >
             <MapController
-              shops={shops} //取得した店舗ステート
-              selectedShop={selectedShop} //選択中の店舗ステート
-              onMarkerClick={setSelectedShop} //マーカークリック時のリスナーに選択中の店舗ステートを登録
-              onMapLoad={setMapInstance} //地図ロード時のリスナーにMapインスタンスステートを登録
-              position={position} // ← 追加
+              shops={shopsWithScore}
+              selectedShop={selectedShop}
+              onMarkerClick={setSelectedShop}
+              onMapLoad={setMapInstance}
+              position={position}
             />
           </Map>
         </main>
