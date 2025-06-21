@@ -44,7 +44,7 @@ function VisitingPageInner() {
           </button>
         </Link>
         {shopId && (
-          <Link href={`/shop/${shopId}/evaluation`}>
+          <Link href={`/evaluation/${shopId}`}>
             <button className="font-sans bg-yellow-400 text-black text-xl px-8 py-3 rounded-lg shadow-md hover:bg-yellow-500 transition-colors">
               このお店を評価する
             </button>
