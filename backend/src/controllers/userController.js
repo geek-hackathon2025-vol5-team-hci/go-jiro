@@ -2,6 +2,37 @@
 const prisma = require('../config/prisma');
 
 /**
+ * ログインユーザーのプロフィール情報を取得する
+ */
+exports.getProfile = async (req, res, next) => {
+  try {
+    const googleId = req.user.id;
+    if (!googleId) {
+      return res.status(401).json({ message: '認証されていません。' });
+    }
+
+    // データベースから最新のユーザー情報を取得
+    const user = await prisma.user.findUnique({
+      where: { googleId: googleId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'ユーザーが見つかりません。' });
+    }
+    console.log('--- Returning user profile data from DB: ---');
+    console.log(user);
+
+    // フロントエンドが期待する { user: ... } 形式で返す
+    res.status(200).json({ user: user });
+
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    next(error);
+  }
+};
+
+
+/**
  * ログインユーザーのプロフィール情報を更新する
  * @param {*} req
  * @param {*} res
@@ -51,6 +82,10 @@ exports.updateProfile = async (req, res, next) => {
         gender,
       },
     });
+    // --- ▼▼▼ デバッグコードを追加 ▼▼▼ ---
+    console.log('--- Data after update (from returned value) ---');
+    console.log(updatedUser);
+    // --- ▲▲▲ デバッグコードここまで ▲▲▲ ---
 
     res.status(200).json({
       message: 'プロフィールを更新しました。',
