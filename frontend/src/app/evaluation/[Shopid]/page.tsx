@@ -1,4 +1,4 @@
-import { Shop } from "../../shop/[shopid]/types";
+import { Shop } from "../../shop/[Shopid]/types";
 import EvaluationForm from "./EvaluationForm"; // クライアントコンポーネント
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
