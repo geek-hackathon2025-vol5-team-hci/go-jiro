@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-// ユーザープロフィールの型定義（編集可能なフィールドを追加）
+// ユーザープロフィールの型定義
 interface UserProfile {
   id: number;
   googleId: string;
   displayName: string;
   username: string | null;
-  email: string; // emails[0].valueの値をここに格納
+  email: string;
   jiroCount: number | null;
-  favoriteCall: string | null;
   age: number | null;
   gender: string | null;
+  favoriteCall: string | null;
   photos: { value: string }[];
 }
 
@@ -29,29 +29,43 @@ export default function ProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // ユーザー情報を取得するAPIを叩く
-    console.log("ユーザー情報を取得中...");
+    setIsLoading(true);
+    let initialUser: UserProfile | null = null;
+
+    // ステップ1: セッションから高速に基本情報を取得
     fetch(`${apiBaseUrl}/api/auth/profile`, { credentials: 'include' })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Not authenticated");
-        }
+      .then(response => {
+        if (!response.ok) throw new Error("Not authenticated (auth)");
         return response.json();
       })
-      .then((data) => {
-        if (data.user) {
-          // APIからのデータをフロントエンドの型に合わせる
-          const userData = {
-            ...data.user,
-            email: data.user.emails?.[0]?.value || data.user.email,
-          };
-          setUser(userData);
-        } else {
-          throw new Error("User data not found");
-        }
+      .then(authData => {
+        if (!authData.user) throw new Error("User data not found in session");
+
+        initialUser = {
+          ...authData.user,
+          email: authData.user.emails?.[0]?.value || authData.user.email,
+        };
+
+        // ステップ2: DBから最新の完全なプロフィールを取得
+        return fetch(`${apiBaseUrl}/api/users/profile`, { credentials: 'include' });
       })
-      .catch(() => {
-        console.log("認証されていないため、ホームページにリダイレクトします。");
+      .then(response => {
+        if (!response.ok) throw new Error("Not authenticated (users)");
+        return response.json();
+      })
+      .then(dbData => {
+        if (!dbData.user) throw new Error("User data not found in database");
+
+        // ステップ3: データを結合
+        const combinedUser = {
+          ...initialUser,
+          ...dbData.user,
+        };
+        
+        setUser(combinedUser);
+      })
+      .catch(err => {
+        console.error("ユーザー情報の取得に失敗しました:", err.message);
         router.push("/");
       })
       .finally(() => {
@@ -83,7 +97,7 @@ export default function ProfilePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Cookieを送信するために必要
+        credentials: 'include',
         body: JSON.stringify({
           displayName: user.displayName,
           username: user.username,
@@ -99,9 +113,11 @@ export default function ProfilePage() {
         throw new Error(errorData.message || 'プロフィールの更新に失敗しました。');
       }
 
-      const updatedUser = await response.json();
-      // レスポンスのemailはそのままなので、元のuser.emailを維持する
-      setUser({ ...updatedUser.data, email: user.email, photos: user.photos });
+      const result = await response.json();
+      setUser(prevUser => ({
+        ...prevUser!,
+        ...result.data,
+      }));
       setMessage('プロフィールが正常に更新されました！');
 
     } catch (err: any) {
