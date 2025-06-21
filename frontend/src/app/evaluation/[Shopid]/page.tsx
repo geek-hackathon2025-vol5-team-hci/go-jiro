@@ -1,5 +1,5 @@
-import { Shop } from "../../shop/[Shopid]/types";
-import EvaluationForm from "./EvaluationForm"; // すぐ次に作成するクライアントコンポーネント
+import { Shop } from "../../shop/[shopid]/types";
+import EvaluationForm from "./EvaluationForm"; // クライアントコンポーネント
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -18,13 +18,15 @@ async function getShopData(shopId: string): Promise<Shop | null> {
 }
 
 // ページ本体（サーバーコンポーネント）
-export default async function EvaluationPage({ params }: { params: { shopid: string } }) {
-  const { shopid } = params; // サーバー側でパラメータを直接受け取る
+export default async function EvaluationPage({
+  params,
+}: {
+  params: Promise<{ shopid: string }>;
+}) {
+  const { shopid } = await params; // ← Promise を await で展開
 
-  // サーバー側でデータを取得
   const shop = await getShopData(shopid);
 
-  // 店舗が見つからない場合の表示
   if (!shop) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -36,6 +38,5 @@ export default async function EvaluationPage({ params }: { params: { shopid: str
     );
   }
 
-  // 取得したデータをクライアントコンポーネントに渡して表示
   return <EvaluationForm shop={shop} />;
 }
