@@ -85,11 +85,6 @@ export default function ProfilePage() {
                   地図ページへ
                 </button>
               </Link>
-              <Link href="/">
-                <button className="w-full px-6 py-2 bg-gray-200 text-black font-semibold rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75">
-                  ホームへ戻る
-                </button>
-              </Link>
               <Link href={`${apiBaseUrl}/api/auth/logout`}>
                 <button className="w-full mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
                   ログアウト
