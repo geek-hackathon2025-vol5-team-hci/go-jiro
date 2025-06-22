@@ -47,7 +47,9 @@ const calculateDistance = (
 // --- 営業中判定 ---
 const checkIsOpen = (openingHours?: string): boolean => {
   if (!openingHours) return false;
-  const match = openingHours.match(/(\d{1,2})時(\d{2})分～(\d{1,2})時(\d{2})分/);
+  const match = openingHours.match(
+    /(\d{1,2})時(\d{2})分～(\d{1,2})時(\d{2})分/
+  );
   if (!match) return false;
   const [, sh, sm, eh, em] = match.map(Number);
   const startMinutes = sh * 60 + sm;
@@ -295,7 +297,11 @@ const MapController = ({
       )}
       {position && (
         <AdvancedMarker position={position} title={"現在位置"}>
-          <Pin background={"#007bff"} borderColor={"#ffffff"} glyphColor={"#ffffff"} />
+          <Pin
+            background={"#007bff"}
+            borderColor={"#ffffff"}
+            glyphColor={"#ffffff"}
+          />
         </AdvancedMarker>
       )}
     </>
@@ -331,7 +337,8 @@ const ShopCard = ({ shop }: { shop: Shop }) => {
       {shop.openingHours && (
         <div className="mt-3 p-2 bg-yellow-100 rounded-lg">
           <p className="text-sm font-semibold text-yellow-800">
-            今日の営業時間: <span className="font-normal">{shop.openingHours}</span>
+            今日の営業時間:{" "}
+            <span className="font-normal">{shop.openingHours}</span>
           </p>
         </div>
       )}
@@ -352,9 +359,21 @@ const ShopCard = ({ shop }: { shop: Shop }) => {
           </div>
         )}
       {shop.distance !== undefined && (
-        <p className="text-black text-sm mt-1">距離: {shop.distance.toFixed(1)}km</p>
+        <p className="text-black text-sm mt-1">
+          距離: {shop.distance.toFixed(1)}km
+        </p>
       )}
-      <Link href={`/shop/${shop.id}`}>
+      <Link
+        href={{
+          pathname: `/shop/${shop.id}`,
+          query: {
+            shopName: shop.name,
+            openHour: shop.openingHours,
+            jiroScore: shop.jiro_difficulty?.toString() ?? "0",
+            jiroIcon: getImageByScore(shop.jiro_difficulty ?? 0),
+          },
+        }}
+      >
         <button className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
           詳細を見る
         </button>
@@ -371,7 +390,12 @@ const HamburgerIcon = () => (
     stroke="currentColor"
     viewBox="0 0 24 24"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 6h16M4 12h16m-7 6h7"
+    />
   </svg>
 );
 
@@ -383,7 +407,12 @@ const CloseIcon = () => (
     stroke="currentColor"
     viewBox="0 0 24 24"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 );
 
