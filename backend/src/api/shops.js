@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', shopController.getShops);
 
-router.get('/:shopId', shopController.getShopById); //コールバック関数で先にミドルウェアを挟むことでログインユーザーのみが叩ける
+router.get('/:shopId', shopController.getShopById);
 router.put('/:shopId', ensureAuthenticated, shopController.updateShop); //コールバック関数で先にミドルウェアを挟むことでログインユーザーのみが叩ける
 
 module.exports = router;
