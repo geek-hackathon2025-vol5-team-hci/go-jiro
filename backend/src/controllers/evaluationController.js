@@ -1,61 +1,90 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+// backend/src/controllers/evaluationController.js
+const prisma = require('../config/prisma');
 
-exports.createEvaluation = async (req, res) => {
+exports.createEvaluation = async (req, res, next) => {
   const { shopId, estimatePortion, actualPortion, orderHelp, exitPressure, comment } = req.body;
-  const userId = req.user.id;
-
-
+  
   try {
-    // 計算の途中経過を確認
+    // ログインしているユーザーの情報を取得
     const googleId = req.user.id;
-
     const user = await prisma.user.findUnique({ where: { googleId } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    const userId = user.id;
 
-    const userId = user.id; // ← これは Int 型
-    const jirodo = ((-estimatePortion + actualPortion + 2 * orderHelp + 2 * exitPressure) * 100) / 24;
-    console.log("⚙️ Calculated jirodo:", jirodo);
+    // --- トランザクション処理開始 ---
+    // 評価の作成と店舗の平均点更新を、まとめて安全に実行します
+    const newEvaluation = await prisma.$transaction(async (tx) => {
+      
+      // --- ステップ1: 今回の評価(Evaluation)を作成 ---
+      const jirodoFloat = ((-estimatePortion + actualPortion + 2 * orderHelp + 2 * exitPressure) * 100) / 24;
+      const jirodo = Math.round(jirodoFloat); // 整数に丸める
 
-    // Prismaのcreate前にdataオブジェクトをログ出力
-    const createData = {
-      jirodo,
-      estimatePortion,
-      actualPortion,
-      orderHelp,
-      exitPressure,
-      comment,
-      shop: { connect: { id: shopId } },
-      user: { connect: { id: userId } },
-    };
-   
+      const createdEval = await tx.evaluation.create({
+        data: {
+          jirodo,
+          estimatePortion,
+          actualPortion,
+          orderHelp,
+          exitPressure,
+          comment,
+          shop: { connect: { id: shopId } },
+          user: { connect: { id: userId } },
+        },
+      });
+      console.log("✅ Created evaluation:", createdEval);
 
-    const newEvaluation = await prisma.evaluation.create({
-      data: createData,
+      // --- ステップ2: 店舗(Shop)の平均点を計算して更新 ---
+      
+      // 2a. このお店の評価をすべて取得
+      const allEvaluations = await tx.evaluation.findMany({
+        where: { shopId: shopId },
+      });
+
+      // 2b. 平均値を計算
+      if (allEvaluations.length > 0) {
+        const totalJirodo = allEvaluations.reduce((sum, ev) => sum + ev.jirodo, 0);
+        const averageJirodo = totalJirodo / allEvaluations.length;
+        const roundedAverage = Math.round(averageJirodo); // 平均値も整数に
+        
+
+        // 2c. Shopテーブルのjiro_difficultyを更新
+        await tx.shop.update({
+          where: { id: shopId },
+          data: { jiro_difficulty: roundedAverage },
+        });
+      
+      }
+
+      // トランザクションの結果として、作成した評価データを返す
+      return createdEval; 
     });
 
-    console.log("✅ Created evaluation:", newEvaluation);
     res.status(201).json(newEvaluation);
+
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ message: 'この店舗は既に評価済みです。' });
+    }
     console.error("💥 Prisma Error:", error);
     res.status(400).json({ message: 'Error creating evaluation', error: error.message });
   }
 };
+
 
 exports.getEvaluationsByShopId = async (req, res) => {
   const { shopId } = req.params;
   console.log("🔍 Fetch evaluations for shopId:", shopId);
   try {
     const evaluations = await prisma.evaluation.findMany({
-      where: { shopId },  // parseIntは使わない想定
+      where: { shopId },
       include: {
         user: {
           select: {
             id: true,
-            name: true,
+            displayName: true, // nameからdisplayNameに変更
           },
         },
       },
