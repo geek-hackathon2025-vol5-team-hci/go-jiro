@@ -62,7 +62,7 @@ model User {
   age          Int?     // 年齢は任意登録
   gender       String?  // 性別は任意登録
   createdAt    DateTime @default(now()) // ユーザー登録日
-   evaluations Evaluation[]
+  evaluations Evaluation[]
 }
 
 model Evaluation {

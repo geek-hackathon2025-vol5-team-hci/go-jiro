@@ -40,24 +40,57 @@ const defaultShopTemplate = {
 };
 
 
+
 const getShops = async (req, res, next) => {
   try {
-    // フロントエンドからのクエリパラメータを取得
     const { keyword, lat, lng } = req.query;
 
     if (!keyword || !lat || !lng) {
       return res.status(400).json({ message: 'keyword, lat, lng are required' });
     }
     
-    // 緯度と経度を数値に変換
     const searchParams = {
       keyword,
       lat: parseFloat(lat),
       lng: parseFloat(lng),
     };
 
-    const shops = await findShopsFromGoogle(searchParams);
-    res.json(shops);
+    // 1. Googleから店舗リストを取得
+    const googleShops = await findShopsFromGoogle(searchParams);
+    const shopIds = googleShops.map(shop => shop.id);
+
+    // 2. DBから対応する店舗のjiro_difficultyを取得
+    const prismaShops = await prisma.shop.findMany({
+      where: {
+        id: {
+          in: shopIds,
+        },
+      },
+      select: {
+        id: true,
+        jiro_difficulty: true,
+      },
+    });
+    
+    // ★★★ デバッグログ ★★★
+    console.log("[DEBUG] getShops: DBから読み取ったデータ:", prismaShops);
+
+    // 3. 効率的にマージするための準備
+    const prismaShopsMap = new Map(
+      prismaShops.map(shop => [shop.id, shop])
+    );
+
+    // 4. Googleの情報とDBの情報をマージ
+    const mergedShops = googleShops.map(googleShop => {
+      const prismaShop = prismaShopsMap.get(googleShop.id);
+      return {
+        ...googleShop,
+        jiro_difficulty: prismaShop ? prismaShop.jiro_difficulty : null,
+      };
+    });
+
+    res.json(mergedShops);
+
   } catch (error) {
     next(error);
   }
@@ -87,6 +120,7 @@ const getShopById = async (req, res, next) => {
 
     // 店舗が見つかった場合は、その情報を返す
     if (shop) {
+      console.log(`[DEBUG] getShopById: DBから見つかった店舗「${shop.name}」のjiro_difficulty:`, shop.jiro_difficulty);
       return res.json(shop);
     }
 
