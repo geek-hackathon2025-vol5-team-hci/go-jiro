@@ -93,10 +93,12 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
     )}
     {shop.jiro_score !== undefined && (
       <div className="mt-2 flex items-center space-x-2">
-        <img
+        <Image
           src={getImageByScore(shop.jiro_score)}
           alt="次郎度アイコン"
-          className="w-6 h-6 object-contain"
+          className="object-contain"
+          width={24}
+          height={24}
         />
         <p className="text-black text-sm font-semibold">二郎度: {shop.jiro_score}</p>
       </div>
@@ -257,10 +259,12 @@ const ShopList = ({
           >
             <div className="flex items-center space-x-3">
               {/* スコアに応じた画像 */}
-              <img
+              <Image
                 src={getImageByScore(shop.jiro_score!)}
                 alt={`${shop.name} アイコン`}
-                className={`w-10 h-10 object-contain ${!shop.isOpen ? "opacity-50" : ""}`}
+                className="object-contain"
+                width={40}
+                height={40}
               />
               <div className="flex-grow">
                 <div className="flex items-center justify-between mb-1">
