@@ -17,7 +17,7 @@ function VisitingPageInner() {
       <div className="max-w-md w-full mx-auto p-6 bg-yellow-300 rounded-2xl shadow-lg text-center">
         <h1 className="text-4xl font-extrabold text-black mb-2">来店中</h1>
         <p className="text-lg font-medium text-black mb-6">
-         <span className="font-bold">{shopName || "お店"}</span> でのコール
+          <span className="font-bold">{shopName || "お店"}</span> でのコール
         </p>
 
         <div className="text-left space-y-6">
@@ -45,13 +45,13 @@ function VisitingPageInner() {
 
       <div className="mt-10 text-center space-x-4">
         <Link href="/map">
-          <button className="bg-white text-black text-xl px-6 py-2 rounded-lg shadow-md hover:bg-gray-300 transition-colors">
+          <button className="bg-white text-black text-xl font-bold px-6 py-2 rounded-lg shadow-md hover:bg-gray-300 transition-colors">
             地図に戻る
           </button>
         </Link>
         {shopId && (
           <Link href={`/evaluation/${shopId}`}>
-            <button className="bg-yellow-400 text-black text-xl px-6 py-2 rounded-lg shadow-md hover:bg-yellow-500 transition-colors">
+            <button className="bg-black text-yellow-300 text-xl font-bold px-6 py-2 rounded-lg shadow-md hover:bg-yellow-500 transition-colors">
               このお店を評価する
             </button>
           </Link>
