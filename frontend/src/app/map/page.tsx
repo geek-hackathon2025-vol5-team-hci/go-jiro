@@ -65,7 +65,7 @@ const checkIsOpen = (openingHours?: string): boolean => {
 
 // ポップアップウインドウの内容
 const ShopCard = ({ shop }: { shop: Shop }) => (
-  <div className="p-4 border rounded-lg shadow-md bg-white">
+  <div className="shadow-md bg-white">
     <div className="flex items-center space-x-2 mb-2">
       <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
       <span
