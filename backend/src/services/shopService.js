@@ -79,7 +79,7 @@ const findShopsFromGoogle = async ({ keyword, lat, lng }) => {
         const photoResourceName = place.photos[0].name;
         photoUrl = `https://places.googleapis.com/v1/${photoResourceName}/media?maxHeightPx=400&key=${process.env.Maps_API_KEY}`;
       }
-      console.log(place.regularOpeningHours);
+      //console.log(place.regularOpeningHours);
       return {
         id: place.id, // 店舗のID
         name: place.displayName.text, // 店舗名
