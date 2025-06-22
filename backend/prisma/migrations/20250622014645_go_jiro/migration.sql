@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Evaluation" ALTER COLUMN "jirodo" SET DATA TYPE DOUBLE PRECISION;
