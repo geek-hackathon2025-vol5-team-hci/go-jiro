@@ -22,6 +22,27 @@ type Shop = {
   photo?: string;
   openingHours?: string;
   jiro_score?: number; // 次郎度スコア
+  distance?: number; // 現在位置からの距離（km）
+};
+
+// 2点間の距離を計算する関数（Haversine formula）
+const calculateDistance = (
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number => {
+  const R = 6371; // 地球の半径（km）
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 };
 
 // ポップアップウインドウの内容
@@ -50,6 +71,9 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
         />
         <p className="text-black text-sm font-semibold">二郎度: {shop.jiro_score}</p>
       </div>
+    )}
+    {shop.distance !== undefined && (
+      <p className="text-black text-sm mt-1">距離: {shop.distance.toFixed(1)}km</p>
     )}
     <Link href={`/shop/${shop.id}`}>
       <button className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-md shadow-md hover:bg-blue-800">
@@ -105,27 +129,60 @@ const assignJiroScore = (shops: Shop[]): Shop[] => {
   }));
 };
 
+// ソートタイプの定義
+type SortType = "distance" | "jiro_high" | "jiro_low";
+
 const ShopList = ({
   shops,
   selectedShop,
   onShopSelect,
   onClose,
+  userPosition,
 }: {
   shops: Shop[];
   selectedShop: Shop | null;
   onShopSelect: (shop: Shop | null) => void;
   onClose: () => void;
+  userPosition: { lat: number; lng: number } | null;
 }) => {
-  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [sortType, setSortType] = useState<SortType>("distance");
 
-  // 並び替え処理（次郎度が未定義のときは0扱い）
+  // 並び替え処理
   const sortedShops = useMemo(() => {
-    return [...shops].sort((a, b) => {
-      const scoreA = a.jiro_score ?? 0;
-      const scoreB = b.jiro_score ?? 0;
-      return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
+    if (!userPosition) return shops;
+
+    // 距離を計算して各店舗に追加
+    const shopsWithDistance = shops.map((shop) => ({
+      ...shop,
+      distance: calculateDistance(
+        userPosition.lat,
+        userPosition.lng,
+        shop.latitude,
+        shop.longitude
+      ),
+    }));
+
+    // ソートタイプに応じて並び替え
+    return [...shopsWithDistance].sort((a, b) => {
+      switch (sortType) {
+        case "distance":
+          return (a.distance ?? 0) - (b.distance ?? 0);
+        case "jiro_high":
+          return (b.jiro_score ?? 0) - (a.jiro_score ?? 0);
+        case "jiro_low":
+          return (a.jiro_score ?? 0) - (b.jiro_score ?? 0);
+        default:
+          return 0;
+      }
     });
-  }, [shops, sortOrder]);
+  }, [shops, sortType, userPosition]);
+
+  // ソートオプションの定義
+  const sortOptions = [
+    { value: "distance", label: "📍 近い順" },
+    { value: "jiro_high", label: "🔥 二郎度: 高い順" },
+    { value: "jiro_low", label: "🌱 二郎度: 低い順" },
+  ] as const;
 
   return (
     <div className="w-80 h-full bg-white p-4 shadow-lg border-r flex flex-col">
@@ -137,16 +194,23 @@ const ShopList = ({
         </button>
       </div>
 
-      {/* 並び替えボタン */}
+      {/* 並び替えタブ */}
       <div className="mb-4">
-        <button
-          onClick={() =>
-            setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
-          }
-          className="px-3 py-1 text-sm text-black bg-gray-200 hover:bg-gray-300 rounded"
-        >
-          二郎度: {sortOrder === "desc" ? "高い順" : "低い順"}
-        </button>
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          {sortOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setSortType(option.value)}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                sortType === option.value
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 店舗リスト */}
@@ -184,6 +248,11 @@ const ShopList = ({
                     {getLevelByScore(shop.jiro_score!)}
                   </span>
                 </div>
+                {shop.distance !== undefined && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    距離: {shop.distance.toFixed(1)}km
+                  </p>
+                )}
               </div>
             </div>
           </li>
@@ -369,6 +438,7 @@ export default function MapPage() {
             selectedShop={selectedShop}
             onShopSelect={setSelectedShop}
             onClose={() => setIsMenuOpen(false)}
+            userPosition={position}
           />
         </div>
 
