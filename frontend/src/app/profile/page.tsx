@@ -120,9 +120,12 @@ export default function ProfilePage() {
       }));
       setMessage('プロフィールが正常に更新されました！');
 
-    } catch (err: any) {
-      setError(err.message);
-    }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('予期しないエラーが発生しました。');
+      }    }
   };
 
   if (isLoading) {
