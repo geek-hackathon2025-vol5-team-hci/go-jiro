@@ -23,9 +23,13 @@ async function getShopData(shopId: string): Promise<Shop | null> {
  * 評価ページの本体（サーバーコンポーネント）
  * ページの名前を EvaluationPage に変更し、正しい引数の受け取り方に修正
  */
-export default async function EvaluationPage({ params }: { params: { Shopid: string } }) {
-  // URLの[Shopid]部分が、params.Shopidとして直接渡されます
-  const { Shopid } = params;
+export default async function EvaluationPage({
+  params,
+}: {
+  params: { Shopid: string } | Promise<{ Shopid: string }>;
+}) {
+  // Promiseでも普通のオブジェクトでも対応できるように await Promise.resolve() を使う
+  const { Shopid } = await Promise.resolve(params);
 
   // APIからデータを取得
   const shop = await getShopData(Shopid);
