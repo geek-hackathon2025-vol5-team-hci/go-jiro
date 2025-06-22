@@ -1,7 +1,16 @@
 // backend/src/controllers/authController.js
+
 exports.googleCallback = (req, res) => {
-  // 認証成功後、フロントエンドのホームページにリダイレクト
-  res.redirect('http://localhost:3001'); // 
+  // セッションの保存を保証してからリダイレクトする
+  req.session.save((err) => {
+    if (err) {
+      // エラーハンドリング
+      console.error('Session save error:', err);
+      return res.status(500).send('Session save error');
+    }
+    // 保存が成功したら、フロントエンドにリダイレクト
+    res.redirect(process.env.FRONTEND_URL);
+  });
 };
 
 exports.getProfile = (req, res) => {
@@ -19,8 +28,17 @@ exports.getProfile = (req, res) => {
 };
 
 exports.logout = (req, res, next) => {
-  req.logout(err => { // 
-    if (err) { return next(err); } // 
-    res.redirect('http://localhost:3001'); // 
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    // セッションを破棄したことを保存してからリダイレクト
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).send('Could not log out.');
+      }
+      res.clearCookie('connect.sid'); // セッションクッキーをクリア
+      res.redirect(process.env.FRONTEND_URL);
+    });
   });
 };

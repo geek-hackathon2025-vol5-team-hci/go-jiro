@@ -3,6 +3,8 @@
 // shopServiceからfindShopsFromGoogleをインポート
 const { findShopsFromGoogle, getShopDetailsFromGoogle } = require('../services/shopService');
 const prisma = require('../config/prisma');
+const shopService = require('../services/shopService');
+
 
 // 新規店舗作成時に使用するデフォルトのテンプレート
 const defaultShopTemplate = {
@@ -131,6 +133,50 @@ const getShopById = async (req, res, next) => {
     console.error('Error in getShopById (find or create):', error);
     next(error);
   }
+};
+exports.getShopAverageEvaluation = async (req, res) => {
+    const shopId = parseInt(req.params.id, 10);
+
+    if (isNaN(shopId)) {
+        return res.status(400).json({ message: 'Invalid shop ID' });
+    }
+
+    try {
+        const averageEvaluation = await prisma.evaluation.aggregate({
+            where: {
+                shopId: shopId,
+            },
+            _avg: {
+                jirodo: true,
+                estimatePortion: true,
+                actualPortion: true,
+                orderHelp: true,
+                exitPressure: true,
+            },
+            _count: {
+                id: true, // 評価の総数をカウント
+            }
+        });
+
+        // 評価が1件もない場合は、平均(avg)がnullになるため、その場合のレスポンスを定義
+        if (averageEvaluation._count.id === 0) {
+            return res.status(200).json({
+                message: 'No evaluations found for this shop.',
+                _avg: {
+                    jirodo: 0,
+                    estimatePortion: 0,
+                    actualPortion: 0,
+                    orderHelp: 0,
+                    exitPressure: 0,
+                },
+                _count: { id: 0 }
+            });
+        }
+
+        res.status(200).json(averageEvaluation);
+    } catch (error) {
+        res.status(500).json({ message: 'Error calculating average evaluation', error: error.message });
+    }
 };
 
 

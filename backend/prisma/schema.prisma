@@ -32,6 +32,7 @@ model Shop {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   jiro_difficulty Int //次郎難易度
+   evaluations Evaluation[]
 }
 
 model CallRule {
@@ -61,4 +62,21 @@ model User {
   age          Int?     // 年齢は任意登録
   gender       String?  // 性別は任意登録
   createdAt    DateTime @default(now()) // ユーザー登録日
+   evaluations Evaluation[]
+}
+
+model Evaluation {
+  id             Int      @id @default(autoincrement())
+  shop           Shop     @relation(fields: [shopId], references: [id])
+  shopId         String   // Shop.idがStringなのでこちらもString
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int      // User.idがIntなのでこちらもInt
+  jirodo         Float
+  estimatePortion Int
+  actualPortion  Int
+  orderHelp     Int
+  exitPressure  Int
+  comment       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

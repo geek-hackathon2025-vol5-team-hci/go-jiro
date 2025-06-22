@@ -1,64 +1,41 @@
-// components/EvaluationPageComponent.tsx
-"use client";
+// app/shop/[shopid]/components/EvaluationPageComponent.tsx
 
-import React from 'react';
-import { Shop, EVALUATION_FACTORS } from '../types'; 
-import { useEvaluation } from '../hooks/useEvaluation';
+import { Shop } from '../types';
 
-const StarRating = ({ rating, onRate }: { rating: number, onRate: (r: number) => void }) => {
+// このコンポーネントが受け取るProps(プロパティ)の型を定義します
+interface EvaluationPageComponentProps {
+  shop: Shop;
+}
+
+// `export default` をつけてコンポーネントを定義し、外部から使えるようにします
+export default function EvaluationPageComponent({ shop }: EvaluationPageComponentProps) {
   return (
-    <div className="flex space-x-2">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <svg
-          key={star}
-          onClick={() => onRate(star)}
-          className={`w-8 h-8 cursor-pointer ${rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.846 5.682a1 1 0 00.95.69h5.986c.969 0 1.371 1.24.588 1.81l-4.84 3.522a1 1 0 00-.364 1.118l1.846 5.681c.3.921-.755 1.688-1.54 1.118l-4.84-3.522a1 1 0 00-1.176 0l-4.84 3.522c-.784.57-1.838-.197-1.539-1.118l1.846-5.681a1 1 0 00-.364-1.118L2.05 11.11c-.783-.57-.38-1.81.588-1.81h5.986a1 1 0 00.95-.69L9.049 2.927z" />
-        </svg>
-      ))}
-    </div>
-  );
-};
+    <main className="flex flex-col items-center justify-center min-h-screen bg-yellow-100 p-8">
+      <div className="w-full max-w-md mx-auto bg-white border-2 border-black rounded-xl shadow-lg p-8">
+        
+        <h1 className="text-3xl font-bold text-center text-black mb-2">
+          {shop.name}
+        </h1>
+        <p className="text-center text-gray-600 mb-6">
+          このお店を評価する
+        </p>
 
-export default function EvaluationPageComponent({ shop }: { shop: Shop }) {
-  const { ratings, handleRatingChange, comment, setComment, isSubmitting, handleSubmit } = useEvaluation(shop);
-
-  return (
-    <div className="max-w-2xl mx-auto p-8 bg-white rounded-2xl shadow-lg mt-10">
-      <h1 className="text-2xl font-bold text-center text-gray-800">
-        「{shop.name}」の評価
-      </h1>
-      <p className="text-center text-gray-600 mt-2">今回の来店体験はいかがでしたか？</p>
-      
-      <div className="space-y-4 my-6">
-        {EVALUATION_FACTORS.map(({ key, label }) => (
-          <div key={key} className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-gray-700">{label}</span>
-            <StarRating 
-              rating={ratings[key]}
-              onRate={(value) => handleRatingChange(key, value)}
-            />
+        {/* ここから下に、評価フォームなどの具体的な内容を実装していきます */}
+        <form className="space-y-4">
+          <div>
+            <label htmlFor="rating" className="block text-sm font-bold text-gray-700">評価 (1-5)</label>
+            <input type="number" id="rating" name="rating" min="1" max="5" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
           </div>
-        ))}
+          <div>
+            <label htmlFor="comment" className="block text-sm font-bold text-gray-700">コメント</label>
+            <textarea id="comment" name="comment" rows={4} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500"></textarea>
+          </div>
+          <button type="submit" className="w-full px-6 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+            評価を送信
+          </button>
+        </form>
+
       </div>
-
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="コメント（任意）"
-        className="w-full h-32 p-3 border rounded-md mt-4 focus:ring-2 focus:ring-yellow-400"
-      />
-
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="w-full mt-6 bg-yellow-500 text-black font-bold px-4 py-3 rounded-lg text-lg disabled:bg-gray-400"
-      >
-        {isSubmitting ? '送信中...' : '評価を送信する'}
-      </button>
-    </div>
+    </main>
   );
 }
