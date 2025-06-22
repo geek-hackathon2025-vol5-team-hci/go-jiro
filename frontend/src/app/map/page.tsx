@@ -98,7 +98,7 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
     {/* jiro_difficulty を表示 */}
     {shop.jiro_difficulty !== undefined && shop.jiro_difficulty !== null && (
       <div className="mt-2 flex items-center space-x-2">
-        <img
+        <Image
           src={getImageByScore(shop.jiro_difficulty)}
           alt="次郎度アイコン"
           className="object-contain"
