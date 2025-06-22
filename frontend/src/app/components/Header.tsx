@@ -5,10 +5,17 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../hooks/useAuth';
+import { usePathname } from 'next/navigation';
 
 export const Header = () => {
   const { user, isLoading } = useAuth();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const pathname = usePathname();
+
+  // タイトル画面（ルートパス）ではヘッダーを非表示
+  if (pathname === '/') {
+    return null;
+  }
 
   const renderAuthStatus = () => {
     if (isLoading) {
