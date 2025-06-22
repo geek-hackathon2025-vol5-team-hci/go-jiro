@@ -23,6 +23,7 @@ type Shop = {
   openingHours?: string;
   jiro_difficulty?: number | null; // DBから来る次郎難易度(nullの可能性あり)
   distance?: number; // 現在位置からの距離（km）
+  isOpen?: boolean; // 営業中かどうか
 };
 
 // 2点間の距離を計算する関数
@@ -45,10 +46,38 @@ const calculateDistance = (
   return R * c;
 };
 
-// ポップアップウインドウの内容を修正
+// 営業時間から営業中かどうかを判定する関数（簡易版）
+const checkIsOpen = (openingHours?: string): boolean => {
+  if (!openingHours) return Math.random() > 0.3; // 営業時間不明の場合はランダム（70%の確率で営業中）
+  
+  // 簡易的な営業時間チェック（実際のAPIからのデータに応じて調整が必要）
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  // 基本的なパターンをチェック（11:00-22:00など）
+  if (openingHours.includes('定休日') || openingHours.includes('準備')) {
+    return false;
+  }
+  
+  // 簡易的に11-22時を営業時間とする（実際はより複雑な解析が必要）
+  return currentHour >= 11 && currentHour < 22;
+};
+
+// ポップアップウインドウの内容
 const ShopCard = ({ shop }: { shop: Shop }) => (
   <div className="p-4 border rounded-lg shadow-md bg-white">
-    <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
+    <div className="flex items-center space-x-2 mb-2">
+      <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
+      <span
+        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+          shop.isOpen
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {shop.isOpen ? "営業中" : "準備中"}
+      </span>
+    </div>
     {shop.photo && (
       <Image
         src={shop.photo}
@@ -68,7 +97,9 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
         <img
           src={getImageByScore(shop.jiro_difficulty)}
           alt="次郎度アイコン"
-          className="w-6 h-6 object-contain"
+          className="object-contain"
+          width={24}
+          height={24}
         />
         <p className="text-black text-sm font-semibold">二郎度: {shop.jiro_difficulty}</p>
       </div>
@@ -85,11 +116,48 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
 );
 
 const HamburgerIcon = () => ( <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /> </svg> );
-const CloseIcon = () => ( <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> </svg> );
-const getImageByScore = (score: number) => { if (score <= 25) return "/jiros/umeJiro.png"; if (score <= 50) return "/jiros/takeJiro.png"; if (score <= 75) return "/jiros/matsuJiro.png"; return "/jiros/oniJiro.png"; };
-const getColorByScore = (score: number) => { if (score <= 25) return "#ec4899"; if (score <= 50) return "#a3e635"; if (score <= 75) return "#15803d"; return "#7e22ce"; };
-const getLevelByScore = (score: number) => { if (score <= 25) return "梅"; if (score <= 50) return "竹"; if (score <= 75) return "松"; return "鬼"; };
 
+// 閉じるボタンアイコン
+const CloseIcon = () => (
+  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+// スコアに応じた画像を返す関数
+const getImageByScore = (score: number) => {
+  if (score <= 25) return "/jiros/umeJiro.png";
+  if (score <= 50) return "/jiros/takeJiro.png";
+  if (score <= 75) return "/jiros/matsuJiro.png";
+  return "/jiros/oniJiro.png";
+};
+
+// スコアに応じたピンの色を返す関数
+const getColorByScore = (score: number) => {
+  if (score <= 25) return "#ec4899"; // ピンク（梅）
+  if (score <= 50) return "#a3e635"; // 黄緑（竹）
+  if (score <= 75) return "#15803d"; // 深緑（松）
+  return "#7e22ce"; // 紫（鬼）
+};
+
+// スコアに応じたレベル名を返す関数
+const getLevelByScore = (score: number) => {
+  if (score <= 25) return "梅";
+  if (score <= 50) return "竹";
+  if (score <= 75) return "松";
+  return "鬼";
+};
+
+// 店舗にランダムなjiro_difficultyと営業状況を割り当てる関数
+const assignJiroScore = (shops: Shop[]): Shop[] => {
+  return shops.map((shop) => ({
+    ...shop,
+    jiro_difficulty: shop.jiro_difficulty ?? Math.floor(Math.random() * 101), // 0～100のランダムスコア
+    isOpen: shop.isOpen ?? checkIsOpen(shop.openingHours), // 営業状況を判定
+  }));
+};
+
+// ソートタイプの定義
 type SortType = "distance" | "jiro_high" | "jiro_low";
 
 const ShopList = ({ shops, selectedShop, onShopSelect, onClose, userPosition }: { shops: Shop[]; selectedShop: Shop | null; onShopSelect: (shop: Shop | null) => void; onClose: () => void; userPosition: { lat: number; lng: number } | null; }) => {
@@ -124,34 +192,80 @@ const ShopList = ({ shops, selectedShop, onShopSelect, onClose, userPosition }: 
         </div>
       </div>
       <ul className="overflow-y-auto flex-grow">
-        {sortedShops.map((shop) => {
-            const score = shop.jiro_difficulty ?? 0; // nullの場合は0として扱う
-            return (
-                <li key={shop.id} className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${ selectedShop?.id === shop.id ? "bg-blue-100 border-blue-500" : "hover:bg-gray-100" }`} onClick={() => onShopSelect(shop)}>
-                    <div className="flex items-center space-x-3">
-                    <img src={getImageByScore(score)} alt={`${shop.name} アイコン`} className="w-10 h-10 object-contain"/>
-                    <div className="flex-grow">
-                        <p className="font-bold text-black text-lg">{shop.name}</p>
-                        <p className="text-sm text-gray-600">{shop.address}</p>
-                        <div className="flex items-center space-x-2 mt-1">
-                        <p className="text-xs text-gray-500">
-                            二郎度: {shop.jiro_difficulty === null ? '未評価' : score}
-                        </p>
-                        <span className="text-xs px-2 py-1 rounded-full text-white font-semibold" style={{ backgroundColor: getColorByScore(score) }}> {getLevelByScore(score)} </span>
-                        </div>
-                        {shop.distance !== undefined && ( <p className="text-xs text-gray-500 mt-1"> 距離: {shop.distance.toFixed(1)}km </p> )}
-                    </div>
-                    </div>
-                </li>
-            )
-        })}
+        {sortedShops.map((shop) => (
+          <li
+            key={shop.id}
+            className={`p-3 mb-2 border rounded-lg cursor-pointer transition-colors ${
+              selectedShop?.id === shop.id
+                ? "bg-blue-100 border-blue-500"
+                : "hover:bg-gray-100"
+            } ${!shop.isOpen ? "opacity-70" : ""}`}
+            onClick={() => onShopSelect(shop)}
+          >
+            <div className="flex items-center space-x-3">
+              {/* スコアに応じた画像 */}
+              <Image
+                src={getImageByScore(shop.jiro_difficulty!)}
+                alt={`${shop.name} アイコン`}
+                className="object-contain"
+                width={40}
+                height={40}
+              />
+              <div className="flex-grow">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="font-bold text-black text-lg">{shop.name}</p>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                      shop.isOpen
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {shop.isOpen ? "営業中" : "準備中"}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600">{shop.address}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p className="text-xs text-gray-500">
+                    二郎度: {shop.jiro_difficulty}
+                  </p>
+                  <span
+                    className="text-xs px-2 py-1 rounded-full text-white font-semibold"
+                    style={{
+                      backgroundColor: getColorByScore(shop.jiro_difficulty!),
+                    }}
+                  >
+                    {getLevelByScore(shop.jiro_difficulty!)}
+                  </span>
+                </div>
+                {shop.distance !== undefined && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    距離: {shop.distance.toFixed(1)}km
+                  </p>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );
 };
 
-// MapControllerを修正
-const MapController = ({ shops, onMarkerClick, selectedShop, onMapLoad, position }: { shops: Shop[]; onMarkerClick: (shop: Shop | null) => void; selectedShop: Shop | null; onMapLoad: (map: google.maps.Map) => void; position: { lat: number; lng: number } | null; }) => {
+// マップにマーカーを表示
+const MapController = ({
+  shops,
+  onMarkerClick,
+  selectedShop,
+  onMapLoad,
+  position,
+}: {
+  shops: Shop[];
+  onMarkerClick: (shop: Shop | null) => void;
+  selectedShop: Shop | null;
+  onMapLoad: (map: google.maps.Map) => void;
+  position: { lat: number; lng: number } | null;
+}) => {
   const map = useMap();
   useEffect(() => { if (map) onMapLoad(map); }, [map, onMapLoad]);
 
@@ -161,8 +275,23 @@ const MapController = ({ shops, onMarkerClick, selectedShop, onMapLoad, position
         const score = shop.jiro_difficulty ?? 0; // nullの場合は0として扱う
         const color = getColorByScore(score);
         return (
-          <AdvancedMarker key={shop.id} position={{ lat: shop.latitude, lng: shop.longitude }} title={`${shop.name} - 次郎度: ${score} (${getLevelByScore(score)})`} onClick={() => onMarkerClick(shop)}>
-            <Pin background={color} borderColor={"#ffffff"} glyphColor={"#ffffff"} glyph={score.toString()}/>
+          <AdvancedMarker
+            key={shop.id}
+            position={{ lat: shop.latitude, lng: shop.longitude }}
+            title={`${shop.name} - 次郎度: ${score} (${getLevelByScore(score)}) - ${shop.isOpen ? '営業中' : '準備中'}`}
+            onClick={() => onMarkerClick(shop)}
+            style={{
+              opacity: shop.isOpen ? 1 : 0.5, // 準備中は半透明
+            }}
+          >
+            <div style={{ opacity: shop.isOpen ? 1 : 0.5 }}>
+              <Pin
+                background={color}
+                borderColor={"#ffffff"}
+                glyphColor={"#ffffff"}
+                glyph={score.toString()}
+              />
+            </div>
           </AdvancedMarker>
         );
       })}
