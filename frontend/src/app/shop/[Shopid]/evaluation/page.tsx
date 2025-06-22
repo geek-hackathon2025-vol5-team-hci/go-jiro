@@ -1,29 +1,31 @@
 // app/shop/[shopid]/evaluation/page.tsx
+
 import { Shop } from '../types';
 import EvaluationPageComponent from '../components/EvaluationPageComponent';
 
-// 仮の店舗データ取得関数 (実際にはDBやAPIから取得)
+// 仮の店舗データ取得関数 (変更なし)
 async function getShopData(shopId: string): Promise<Shop | null> {
+  // この部分は実際のデータベースなどからの取得処理に置き換えてください
   const mockShops: Shop[] = [
     {
       id: '1',
       name: "ラーメン二郎 新宿店",
       callticketOrder: "リョウ,カタサ",
       callOrder: "ヤサイ,アブラ,ニンニク",
-      callRules: [ /* ...ルール多数... */ ],
+      callRules: [],
     },
+    // 他の店舗データ...
   ];
   const shop = mockShops.find(s => s.id.toString() === shopId);
   return shop || null;
 }
 
-// ⬇ここを修正
 export default async function EvaluationPage({
   params,
 }: {
-  params: Promise<{ shopid: string }>;
+  params: Promise<{ shopid: string }>; // ★ Promise型に戻します
 }) {
-  const { shopid } = await params; // Promise を await で展開
+  const { shopid } = await params; // ★ await を再度追加します
   const shop = await getShopData(shopid);
 
   if (!shop) {
