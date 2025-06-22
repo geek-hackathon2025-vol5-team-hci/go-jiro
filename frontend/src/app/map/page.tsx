@@ -26,7 +26,6 @@ type Shop = {
   isOpen?: boolean;
 };
 
-// ★★★ ここに型定義を追加 ★★★
 type SortType = "distance" | "jiro_high" | "jiro_low";
 
 // --- ヘルパー関数群 ---
@@ -440,8 +439,8 @@ function MapPageInner() {
           </div>
         )}
         <Map
-          center={position}
-          zoom={15}
+          defaultCenter={position}
+          defaultZoom={15}
           gestureHandling="greedy"
           disableDefaultUI={true}
           mapId="go-jiro-map"
