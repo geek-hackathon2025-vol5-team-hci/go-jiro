@@ -54,7 +54,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         }
         const data: ShopEvaluation[] = await response.json();
         setEvaluations(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         setErrorEvals(err.message);
       } finally {
         setIsLoadingEvals(false);
@@ -153,7 +153,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
                 </button>
               </Link>
             </div>
-            {/* ★評価一覧コンポーネントをここに追加 */}
+            {/* ★評価一覧コンポーネント */}
             <EvaluationList
               evaluations={evaluations}
               isLoading={isLoadingEvals}
