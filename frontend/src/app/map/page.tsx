@@ -23,6 +23,7 @@ type Shop = {
   openingHours?: string;
   jiro_score?: number; // 次郎度スコア
   distance?: number; // 現在位置からの距離（km）
+  isOpen?: boolean; // 営業中かどうか
 };
 
 // 2点間の距離を計算する関数（Haversine formula）
@@ -45,10 +46,38 @@ const calculateDistance = (
   return R * c;
 };
 
+// 営業時間から営業中かどうかを判定する関数（簡易版）
+const checkIsOpen = (openingHours?: string): boolean => {
+  if (!openingHours) return Math.random() > 0.3; // 営業時間不明の場合はランダム（70%の確率で営業中）
+  
+  // 簡易的な営業時間チェック（実際のAPIからのデータに応じて調整が必要）
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  // 基本的なパターンをチェック（11:00-22:00など）
+  if (openingHours.includes('定休日') || openingHours.includes('準備')) {
+    return false;
+  }
+  
+  // 簡易的に11-22時を営業時間とする（実際はより複雑な解析が必要）
+  return currentHour >= 11 && currentHour < 22;
+};
+
 // ポップアップウインドウの内容
 const ShopCard = ({ shop }: { shop: Shop }) => (
-  <div className="shadow-md bg-white">
-    <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
+  <div className="p-4 border rounded-lg shadow-md bg-white">
+    <div className="flex items-center space-x-2 mb-2">
+      <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
+      <span
+        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+          shop.isOpen
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {shop.isOpen ? "営業中" : "準備中"}
+      </span>
+    </div>
     {shop.photo && (
       <Image
         src={shop.photo}
@@ -127,11 +156,12 @@ const getLevelByScore = (score: number) => {
   return "鬼";
 };
 
-// 店舗にランダムなjiro_scoreを割り当てる関数（APIから取得できない場合の代替）
+// 店舗にランダムなjiro_scoreと営業状況を割り当てる関数
 const assignJiroScore = (shops: Shop[]): Shop[] => {
   return shops.map((shop) => ({
     ...shop,
     jiro_score: shop.jiro_score ?? Math.floor(Math.random() * 101), // 0～100のランダムスコア
+    isOpen: shop.isOpen ?? checkIsOpen(shop.openingHours), // 営業状況を判定
   }));
 };
 
@@ -228,7 +258,7 @@ const ShopList = ({
               selectedShop?.id === shop.id
                 ? "bg-blue-100 border-blue-500"
                 : "hover:bg-gray-100"
-            }`}
+            } ${!shop.isOpen ? "opacity-70" : ""}`}
             onClick={() => onShopSelect(shop)}
           >
             <div className="flex items-center space-x-3">
@@ -241,7 +271,18 @@ const ShopList = ({
                 height={40}
               />
               <div className="flex-grow">
-                <p className="font-bold text-black text-lg">{shop.name}</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="font-bold text-black text-lg">{shop.name}</p>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                      shop.isOpen
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {shop.isOpen ? "営業中" : "準備中"}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-600">{shop.address}</p>
                 <div className="flex items-center space-x-2 mt-1">
                   <p className="text-xs text-gray-500">
@@ -269,7 +310,6 @@ const ShopList = ({
     </div>
   );
 };
-
 
 // マップにマーカーを表示
 const MapController = ({
@@ -303,15 +343,20 @@ const MapController = ({
           <AdvancedMarker
             key={shop.id}
             position={{ lat: shop.latitude, lng: shop.longitude }}
-            title={`${shop.name} - 次郎度: ${score} (${getLevelByScore(score)})`}
+            title={`${shop.name} - 次郎度: ${score} (${getLevelByScore(score)}) - ${shop.isOpen ? '営業中' : '準備中'}`}
             onClick={() => onMarkerClick(shop)}
+            style={{
+              opacity: shop.isOpen ? 1 : 0.5, // 準備中は半透明
+            }}
           >
-            <Pin
-              background={color}
-              borderColor={"#ffffff"}
-              glyphColor={"#ffffff"}
-              glyph={score.toString()}
-            />
+            <div style={{ opacity: shop.isOpen ? 1 : 0.5 }}>
+              <Pin
+                background={color}
+                borderColor={"#ffffff"}
+                glyphColor={"#ffffff"}
+                glyph={score.toString()}
+              />
+            </div>
           </AdvancedMarker>
         );
       })}
