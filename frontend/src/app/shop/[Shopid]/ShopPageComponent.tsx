@@ -54,8 +54,12 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         }
         const data: ShopEvaluation[] = await response.json();
         setEvaluations(data);
-      } catch (err: unknown) {
-        setErrorEvals(err.message);
+        } catch (err: unknown) { // anyをunknownに変更
+          if (err instanceof Error) {
+            setErrorEvals(err.message);
+          } else {
+            setErrorEvals('不明なエラーが発生しました');
+          }
       } finally {
         setIsLoadingEvals(false);
       }
