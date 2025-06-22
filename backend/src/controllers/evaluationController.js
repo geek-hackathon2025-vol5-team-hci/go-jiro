@@ -71,6 +71,8 @@ exports.createEvaluation = async (req, res) => {
     res.status(400).json({ message: '評価の作成に失敗しました。', error: error.message });
   }
 };
+
+
 exports.getEvaluationsByShopId = async (req, res) => {
   const { shopId } = req.params;
   console.log("🔍 Fetch evaluations for shopId:", shopId);
@@ -81,7 +83,8 @@ exports.getEvaluationsByShopId = async (req, res) => {
         user: {
           select: {
             id: true,
-            name: true,
+            displayName: true,
+            username: true,
           },
         },
       },
