@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/prisma');
+//const prisma = new PrismaClient();
 
 exports.createEvaluation = async (req, res) => {
   const { shopId, estimatePortion, actualPortion, orderHelp, exitPressure, comment } = req.body;
