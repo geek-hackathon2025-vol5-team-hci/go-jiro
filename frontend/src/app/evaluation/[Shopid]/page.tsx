@@ -1,3 +1,5 @@
+//frontend/app/evaluation/[Shopid]/page.tsx
+
 import { Shop } from "../../shop/[Shopid]/types";
 import EvaluationForm from "./EvaluationForm"; // 画面表示を担当するコンポーネント
 
