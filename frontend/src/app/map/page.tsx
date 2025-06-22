@@ -65,7 +65,7 @@ const checkIsOpen = (openingHours?: string): boolean => {
 
 // ポップアップウインドウの内容
 const ShopCard = ({ shop }: { shop: Shop }) => (
-  <div className="p-4 border rounded-lg shadow-md bg-white">
+  <div className="shadow-md bg-white">
     <div className="flex items-center space-x-2 mb-2">
       <h2 className="text-2xl font-bold text-black">{shop.name}</h2>
       <span
@@ -89,7 +89,11 @@ const ShopCard = ({ shop }: { shop: Shop }) => (
     )}
     <p className="text-black mt-2">{shop.address}</p>
     {shop.openingHours && (
-      <p className="text-black text-sm mt-1">今日の営業時間: {shop.openingHours}</p>
+      <div className="mt-3 p-2 bg-yellow-100 rounded-lg">
+        <p className="text-sm font-semibold text-yellow-800">
+          今日の営業時間: <span className="font-normal">{shop.openingHours}</span>
+        </p>
+      </div>
     )}
     {shop.jiro_score !== undefined && (
       <div className="mt-2 flex items-center space-x-2">
