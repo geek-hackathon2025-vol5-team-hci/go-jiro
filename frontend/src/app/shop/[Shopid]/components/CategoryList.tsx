@@ -23,6 +23,7 @@ type CategoryListProps = {
   editor: ReturnType<typeof useShopEditor>;
   selections: Record<string, string>;
   setSelections: (value: React.SetStateAction<Record<string, string>>) => void;
+  titleClassName?: string;
 };
 
 /**
