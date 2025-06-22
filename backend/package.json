@@ -11,13 +11,15 @@
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "axios": "^1.10.0",
+    "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.18.2",
     "express-list-endpoints": "^7.1.1",
     "express-session": "^1.18.1",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.16.2"
   },
   "devDependencies": {
     "prisma": "^6.9.0"
