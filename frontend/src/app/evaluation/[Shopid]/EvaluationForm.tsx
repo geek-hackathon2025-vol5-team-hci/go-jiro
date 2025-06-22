@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Shop } from "../../shop/[Shopid]/types";
 
+
+
+
 interface EvaluationFormProps {
   shop: Shop;
 }
@@ -63,7 +66,7 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
         throw new Error(errorData.message || "送信に失敗しました。");
       }
 
-      alert("次郎度を送信しました！");
+      alert("二郎度を送信しました！");
       router.push(`/shop/${shopId}`);
     } catch (err) {
       setError(
@@ -79,7 +82,7 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
   return (
     <div className="max-w-2xl mx-auto p-8 bg-yellow-50 border-4 border-yellow-500 rounded-2xl shadow-xl mt-10">
       <h1 className="text-3xl font-bold text-center text-red-700">
-        「{shop.name}」の次郎度評価
+        「{shop.name}」の二郎度評価
       </h1>
       <p className="text-center text-gray-800 mt-2 font-semibold">
         初心者としての体験を教えてください
@@ -176,7 +179,7 @@ export default function JirodoForm({ shop }: EvaluationFormProps) {
           disabled={isSubmitting}
           className="w-full bg-red-600 text-white font-bold px-4 py-3 rounded-lg text-lg disabled:bg-gray-400"
         >
-          {isSubmitting ? "送信中..." : "次郎度を送信する"}
+          {isSubmitting ? "送信中..." : "二郎度を送信する"}
         </button>
       </form>
 
