@@ -16,8 +16,8 @@ const geistSans = Geist({
 // });
 
 export const metadata: Metadata = {
-  title: "二郎コールシミュレーター", // タイトルを変更
-  description: "ラーメン二郎のコールを練習・シミュレーションできるサイトです。",
+  title: "go-jiro", // タイトルを変更
+  description: "ラーメン二郎に行くためのサイトです。",
 };
 
 export default function RootLayout({
