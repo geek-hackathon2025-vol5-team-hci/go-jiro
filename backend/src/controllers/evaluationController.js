@@ -103,7 +103,8 @@ exports.getEvaluationsByShopId = async (req, res) => {
         user: {
           select: {
             id: true,
-            displayName: true, // nameからdisplayNameに変更
+            displayName: true,
+            username: true,
           },
         },
       },

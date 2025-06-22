@@ -40,3 +40,20 @@ export type Evaluation = {
   rating_hurdle: number;
   comment?: string;
 };
+
+export type ShopEvaluation = {
+  id: number;
+  jirodo: number;
+  comment: string | null;
+  createdAt: string; // ISO 8601 形式の文字列
+  user: {
+    id: number;
+    displayName: string | null;
+    username: string | null;
+  };
+  // 必要に応じて他の評価項目も追加
+  estimatePortion: number;
+  actualPortion: number;
+  orderHelp: number;
+  exitPressure: number;
+};
