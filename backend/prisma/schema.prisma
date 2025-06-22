@@ -80,3 +80,12 @@ model Evaluation {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+// connect-pg-simpleが使用するセッションストア用のモデル
+model session {
+  sid    String   @id
+  sess   Json
+  expire DateTime
+
+  @@index([expire])
+}
