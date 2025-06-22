@@ -19,7 +19,7 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
   const shopNameParam = searchParams.get('shopName');
   const openHour = searchParams.get('openHour');
   const jiroScore = searchParams.get('jiroScore');
-  const jiroIcon = searchParams.get('jiroIcon');
+ // const jiroIcon = searchParams.get('jiroIcon');
   const score = jiroScore ? Number(jiroScore) : null;
   const editor = useShopEditor(shop, shopId);
 
@@ -70,8 +70,12 @@ export default function ShopPageComponent({ shop, shopId }: ShopPageComponentPro
         }
         const data: ShopEvaluation[] = await response.json();
         setEvaluations(data);
-      } catch (err: any) {
-        setErrorEvals(err.message);
+        } catch (err: unknown) { // anyをunknownに変更
+          if (err instanceof Error) {
+            setErrorEvals(err.message);
+          } else {
+            setErrorEvals('不明なエラーが発生しました');
+          }
       } finally {
         setIsLoadingEvals(false);
       }
