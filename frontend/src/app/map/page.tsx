@@ -46,6 +46,7 @@ const calculateDistance = (
   return R * c;
 };
 
+/*
 // 営業時間から営業中かどうかを判定する関数（簡易版）
 const checkIsOpen = (openingHours?: string): boolean => {
   if (!openingHours) return Math.random() > 0.3; // 営業時間不明の場合はランダム（70%の確率で営業中）
@@ -62,6 +63,7 @@ const checkIsOpen = (openingHours?: string): boolean => {
   // 簡易的に11-22時を営業時間とする（実際はより複雑な解析が必要）
   return currentHour >= 11 && currentHour < 22;
 };
+*/
 
 // ポップアップウインドウの内容
 const ShopCard = ({ shop }: { shop: Shop }) => (
@@ -150,15 +152,6 @@ const getLevelByScore = (score: number) => {
   if (score <= 50) return "竹";
   if (score <= 75) return "松";
   return "鬼";
-};
-
-// 店舗にランダムなjiro_difficultyと営業状況を割り当てる関数
-const assignJiroScore = (shops: Shop[]): Shop[] => {
-  return shops.map((shop) => ({
-    ...shop,
-    jiro_difficulty: shop.jiro_difficulty ?? Math.floor(Math.random() * 101), // 0～100のランダムスコア
-    isOpen: shop.isOpen ?? checkIsOpen(shop.openingHours), // 営業状況を判定
-  }));
 };
 
 // ソートタイプの定義
